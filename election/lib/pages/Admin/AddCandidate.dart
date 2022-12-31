@@ -1,11 +1,17 @@
+
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Admin/AuthorizeVoter.dart';
+import 'package:election/services/snackbar.dart';
 import 'package:election/utils/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:list_picker/list_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../../services/Auth.dart';
 import '../../services/functions.dart';
@@ -23,6 +29,8 @@ class AddCandidate extends StatefulWidget {
 
 class _AddCandidateState extends State<AddCandidate> {
 
+  List<String> party = ['BJP','BSP','CPI','CPM','INC','NPC'];
+
 //firebase auth instance initialization
   final User? user = Auth()
       .currentuser; //fi// rebase auth current user initialization
@@ -39,9 +47,15 @@ class _AddCandidateState extends State<AddCandidate> {
   }
 
   //variables declared
-  late int _adharage = 19;
-  late bool _is_adhar_verified = false;
-  late int _adharnum = 12345678;
+  late int _adharage;
+  late int _adharnum;
+  late String name;
+  late String address;
+  late String mobile;
+  late String email;
+  late String district;
+  late String state;
+  late String dob;
 
 //get adhar verification function to get adhar details of the candidate
   Future<void> getAdharVerified(String adharnum) async {
@@ -51,17 +65,23 @@ class _AddCandidateState extends State<AddCandidate> {
           .doc(adharnum)
           .get();
       if (Adhars.data() != null) {
+
         _adharage = Adhars.get('age'); //assign adhars age to adharage
-        _is_adhar_verified =
-            Adhars.get('verified'); //assign if the adhar verified or not
         _adharnum = Adhars.get('adharnum'); //store adharnum in this variablee
-        showSnackBar(succesAdharSnack); //show snackbar
+        name = Adhars.get('name');
+        address = Adhars.get('address');
+        district = Adhars.get('district');
+        state = Adhars.get('state');
+        email = Adhars.get('email');
+        mobile = Adhars.get('mobileNum');
+        dob = Adhars.get('dob');
+        snackbarshow().showSnackBar(snackbarshow().succesAdharSnack, context); //show snackbar
       }
     } catch (e) {
       if (kDebugMode) {
         print('get adhar verified failed ::::: $e');
       }
-      showSnackBar(errorAdharSnack);
+      snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
     }
   }
   final formKey = GlobalKey<FormState>();
@@ -69,6 +89,7 @@ class _AddCandidateState extends State<AddCandidate> {
   TextEditingController candidateNameController = TextEditingController();
   TextEditingController candidateAdharController = TextEditingController();
   TextEditingController AdminmtmskController = TextEditingController();
+  TextEditingController selectpartycontroller = TextEditingController();
 
   //to refresh to see added details
   void refresh() {
@@ -76,18 +97,9 @@ class _AddCandidateState extends State<AddCandidate> {
   }
 
   late int numberOfCandidates;
-
-  SnackBar errorAdharSnack = const SnackBar(
-      content: Text('Adhar verification failed make sure details are right'));
-  SnackBar succesAdharSnack = const SnackBar(
-      content: Text('Adhar verification successfull'));
-  SnackBar errorSnack = const SnackBar(content: Text('Fill all the details'));
-
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
-      SnackBar snackBar) {
-    return ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
+  late File? filetodisplay;
+  late bool isselected = false;
+  UploadTask? uploadTask;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,8 +127,41 @@ class _AddCandidateState extends State<AddCandidate> {
                           const SizedBox(height: 24,),
                           SelectableText(owner_private_key),
                           const SizedBox(height: 24,),
-                          const SizedBox(height: 16,),
-                          Container(padding: const EdgeInsets.all(16),
+                          InkWell(
+                            onTap: () async {
+                              FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                type: FileType.image,
+                                allowMultiple: false,
+                              );
+
+                              if (result != null) {
+                                PlatformFile file = result.files.first;
+                                filetodisplay = File(file.path.toString());
+                                String filename = file.name.toString();
+                                isselected=true;
+                                refresh();
+
+                                if (kDebugMode) {
+                                  print(file.name);
+                                  print(file.bytes);
+                                  print(file.size);
+                                  print(file.extension);
+                                  print(file.path);
+                                }
+                              } else {
+                                isselected=false;
+                                // User canceled the picker
+                              }
+                            },
+                            child: SizedBox(height:100 ,width: 100,
+                              child: ClipRRect(borderRadius:BorderRadius.circular(100),child:Image(image:isselected?Image.file(filetodisplay!).image:
+                              const AssetImage('assets/undraw/electionday.png'),fit:BoxFit.fill,),),
+                            ),
+                          ),
+                          const SizedBox(height: 8,),
+                          const Text('Picture of candidate',style: TextStyle(fontSize:16,),),
+                          const SizedBox(height: 8,),
+                          Container(padding: const EdgeInsets.all(8),
                             child: TextFormField(
                               validator: (value){
                                 if(value == null||value.isEmpty){
@@ -132,8 +177,8 @@ class _AddCandidateState extends State<AddCandidate> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16,),
-                          Container(padding: const EdgeInsets.all(16),
+                          const SizedBox(height: 4,),
+                          Container(padding: const EdgeInsets.all(8),
                             child: TextFormField(
                               validator: (value){
                               if(value == null||value.isEmpty){
@@ -149,7 +194,10 @@ class _AddCandidateState extends State<AddCandidate> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16,),
+                          const SizedBox(height: 4,),
+                          const SizedBox(height: 8,),
+                          ListPickerField(label: 'party of candidate', items:party,controller:selectpartycontroller,),
+                          const SizedBox(height: 8,),
                           Container(padding: const EdgeInsets.all(16),
                             child: TextFormField(
                               validator: (value){
@@ -167,25 +215,30 @@ class _AddCandidateState extends State<AddCandidate> {
                             ),
                           ),
                           const SizedBox(height: 24,),
+                          buildProgress(),
+                          const SizedBox(height: 4,),
                           ElevatedButton(onPressed: () async {
-                            if (formKey.currentState!.validate()){
+                            if (formKey.currentState!.validate()&&filetodisplay!=null){
                               await getAdharVerified(candidateAdharController.text);
-                              candidateAdharController.clear();
                                 if (_adharage >= 18) {
-                                  addCandidate(candidateNameController.text, widget.ethClient, AdminmtmskController.text, widget.electionAdress);
-                                  candidateNameController.clear();
+                                  await uploadimageAndData().then((value) => {
+                                   addCandidate(candidateNameController.text, widget.ethClient, AdminmtmskController.text, widget.electionAdress),
+                                //  candidateAdharController.clear(),candidateNameController.clear(),selectpartycontroller.clear(),
+                                  });
+
                                 } else {
-                                  showSnackBar(errorAdharSnack);
+                                  snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
                                 }
                             } else {
-                              showSnackBar(errorSnack);
+                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                             }
                           }, child: const Text('Add Candidate'))
                         ],
                       ),
                     ),
                   ),
-                  Container(margin: const EdgeInsets.only(bottom: 56),
+                  const Divider(thickness: 2,color: Colors.cyan,),
+                  Container(margin: const EdgeInsets.only(bottom: 56,left:8,),
                     child: SingleChildScrollView(
                       child: StreamBuilder<List>(stream: getCandidatesNum(
                           widget.ethClient, widget.electionAdress).asStream(),
@@ -209,7 +262,9 @@ class _AddCandidateState extends State<AddCandidate> {
                                             child: CircularProgressIndicator(),
                                           );
                                         } else {
-                                          print(candidatesnapshot.data);
+                                          if (kDebugMode) {
+                                            print(candidatesnapshot.data);
+                                          }
                                           return ListTile(
                                             title: Text('Name: ${candidatesnapshot.data![0][0]}'),
                                             subtitle: Text('Votes: ${candidatesnapshot.data![0][1]}'),
@@ -230,4 +285,54 @@ class _AddCandidateState extends State<AddCandidate> {
         )
     );
   }
+  Future<void> uploadimageAndData() async{
+    //file path and reference to storage
+    final String filepath = 'electionimages/${widget.electionName}/partyimages/candidates/${candidateNameController.text.toString()}/';
+    final storageref = FirebaseStorage.instance.ref().child(filepath);
+    //reference to add data to collection
+    final DocumentReference candidate = await FirebaseFirestore.instance.collection('Election').doc(widget.electionName)
+        .collection('candidates').doc(candidateAdharController.text.toString());
+      try{
+        //uploading picture
+      uploadTask = storageref.putFile(filetodisplay!) ;
+      final snapshot = await uploadTask?.whenComplete((){});
+      //uploading data
+      await candidate.set({
+        "Name":candidateNameController.text.toString(),"Age":_adharage,"adharnum":candidateAdharController.text.toString(),
+        "party":selectpartycontroller.text.toString(),"email":email,
+        "phonenum":mobile,"district":district,"state":state,"address":address,"dob":dob,
+      });
+      //clearing controllers
+      if (kDebugMode) {
+        print('succcessssssssssss');
+      }
+    }catch(e){
+        if (kDebugMode) {
+          print('whaat went wronggg :::: $e');
+        }
+      }
+  }
+
+  Widget buildProgress() =>StreamBuilder<TaskSnapshot>(
+      stream: uploadTask?.snapshotEvents,
+      builder:(context , snapshot){
+        if(snapshot.hasData){
+          final data = snapshot.data;
+          double progress = data!.bytesTransferred/data.totalBytes;
+          return SizedBox(height: 50,
+            child: Stack(
+            fit: StackFit.expand,
+              children: [
+                LinearProgressIndicator(value: progress,backgroundColor: Colors.white,color: Colors.cyan,),
+                Center(
+                  child: Text('${(100 * progress).roundToDouble()}%',
+                    style:const TextStyle(color: Colors.grey) ,),
+                ),
+              ],
+          ),);
+        }else{
+          return const SizedBox(height: 50,);
+        }
+      }
+  );
 }
