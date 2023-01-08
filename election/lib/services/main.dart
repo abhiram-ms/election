@@ -18,11 +18,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AnimatedSplashScreen(
-          nextScreen:IntroLogin(),
-          splashIconSize: 200,
-          splash: Center(child: Image.asset('assets/undraw/voting.png')),
-        ),
+      home: Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: AnimatedSplashScreen(
+          backgroundColor:Colors.transparent,
+            nextScreen:IntroLogin(),
+            splashIconSize: 200,
+            splash: const Center(child:Icon(Icons.poll,size: 60,color: Colors.white,) ),
+          ),
+      ),
 
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

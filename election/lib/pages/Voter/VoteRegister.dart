@@ -14,9 +14,10 @@ class VoteRegister extends StatefulWidget {
   final Web3Client ethClient;
   final String electionName;
   final String electionaddress;
+  final List<dynamic>electiondata;
   final String adhar;
   const VoteRegister({Key? key, required this.ethClient, required this.electionName,
-    required this.electionaddress, required this.adhar,}) : super(key: key);
+    required this.electionaddress, required this.adhar, required this.electiondata,}) : super(key: key);
 
   @override
   State<VoteRegister> createState() => _VoteRegisterState();
@@ -74,76 +75,96 @@ class _VoteRegisterState extends State<VoteRegister> {
   @override
   Widget build(BuildContext context) {
     if(isAuth == true){
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
-          actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
-          title: const Text('Voter DASHBOARD'),backgroundColor: Colors.cyan,),
-        body: const Center(child: Text('you have already authorized'),),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
+            actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
+            title: const Text('Voter DASHBOARD'),backgroundColor: Colors.transparent,),
+          body: const Center(child: Text('you have already authorized',style: TextStyle(color: Colors.white),),),
+        ),
       );
     }else{
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
-          actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
-          title: const Text('Voter DASHBOARD'),backgroundColor: Colors.cyan,),
-        body: SingleChildScrollView(
-          child:Container(padding:const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const SizedBox(height: 24,),
-                SelectableText('$voter_adress&&$voter_adress2&&$voter_adress3'),
-                const SizedBox(height: 12,),
-                Center(
-                  child: TextField(
-                      controller: voterName,
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
+            actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
+            title: const Text('Voter DASHBOARD'),backgroundColor: Colors.transparent,),
+          body: SingleChildScrollView(
+            child:Container(padding:const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 24,),
+                  SelectableText('$voter_adress&&$voter_adress2&&$voter_adress3'),
+                  const SizedBox(height: 12,),
+                  Center(
+                    child: TextField(
+                        controller: voterName,
+                        decoration:
+                        const InputDecoration(
+                            hintStyle: TextStyle(color: Colors.white),
+                            hintText: 'Name as in Adhar',border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(8))))
+                    ),
+                  ),
+                  const SizedBox(height: 12,),
+                  Center(
+                    child: TextField(
+                        controller: voterAge,
+                        decoration:
+                        const InputDecoration(
+                            hintStyle: TextStyle(color: Colors.white),
+                            hintText: 'Age as in adhar',border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(8))))
+                    ),
+                  ),
+                  const SizedBox(height: 12,),
+                  const SizedBox(height: 24,),
+                  Center(
+                    child: TextField(
+                      controller: voterAdress,
                       decoration:
-                      const InputDecoration(hintText: 'Name as in Adhar',border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(8))))
+                      const InputDecoration(
+                          hintStyle: TextStyle(color: Colors.white),
+                          hintText: 'Metamask Adress',border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)))),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12,),
-                Center(
-                  child: TextField(
-                      controller: voterAge,
-                      decoration:
-                      const InputDecoration(hintText: 'Age as in adhar',border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(8))))
-                  ),
-                ),
-                const SizedBox(height: 12,),
-                const SizedBox(height: 24,),
-                Center(
-                  child: TextField(
-                    controller: voterAdress,
-                    decoration:
-                    const InputDecoration(hintText: 'Metamask Adress',border: OutlineInputBorder(
-                        borderRadius:
-                        BorderRadius.all(Radius.circular(8)))),
-                  ),
-                ),
-                const SizedBox(height: 24,),
-                ElevatedButton(
-                    onPressed: () async {
-                      if(voterAdress.text.isNotEmpty){
-                        if(voterName.text.isNotEmpty&&voterAge.text.isNotEmpty) {
-                          try{
-                            await registerVoterAuthorize(widget.adhar,voterAdress.text,voterName.text,voterAge.text,user?.email);
-                            showSnackBar(succesRegisterSnack);
-                            gotoDashboard();
-                          }catch(e){
-                            if (kDebugMode) {
-                              print('this is prblmmmmmm   $e');
+                  const SizedBox(height: 24,),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.white),
+                      onPressed: () async {
+                        if(voterAdress.text.isNotEmpty){
+                          if(voterName.text.isNotEmpty&&voterAge.text.isNotEmpty) {
+                            try{
+                              await registerVoterAuthorize(widget.adhar,voterAdress.text,voterName.text,voterAge.text,user?.email);
+                              showSnackBar(succesRegisterSnack);
+                              gotoDashboard();
+                            }catch(e){
+                              if (kDebugMode) {
+                                print('this is prblmmmmmm   $e');
+                              }
+                              showSnackBar(errorRegisterSnack);
                             }
-                            showSnackBar(errorRegisterSnack);
-                          }
+                          }else{showSnackBar(detailserrorSnack);}
                         }else{showSnackBar(detailserrorSnack);}
-                      }else{showSnackBar(detailserrorSnack);}
-                    },
-                    child: const Text('Register'))
-              ],
+                      },
+                      child: const Text('Register',style: TextStyle(color: Colors.purple),))
+                ],
+              ),
             ),
           ),
         ),
@@ -175,7 +196,9 @@ class _VoteRegisterState extends State<VoteRegister> {
   }
 
   void gotoDashboard(){
-    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>VoterHome(ethClient:widget.ethClient, electionName:widget.electionName, electionaddress:widget.electionaddress)), (route) => false);
+    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>
+        VoterHome(ethClient:widget.ethClient, electionName:widget.electionName, electionaddress:widget.electionaddress,
+          electiondata:widget.electiondata,)), (route) => false);
   }
 
 }

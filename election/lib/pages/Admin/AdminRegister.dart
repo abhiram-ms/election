@@ -3,9 +3,12 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Admin/AdminHome.dart';
 import 'package:election/services/VerifyEmail.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:election/services/Auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../services/snackbar.dart';
 
 class AdminRegister extends StatefulWidget {
   const AdminRegister({Key? key}) : super(key: key);
@@ -62,7 +65,9 @@ class _AdminRegisterState extends State<AdminRegister> {
         "Name":Name,"email":Email,"password":Password,"phone":Phone,"Admin":_istrue});
       print('user added successfullyyyyyyy');
     }catch(err){
-
+      if (kDebugMode) {
+        print(err);
+      }
     }
   }
 
@@ -201,8 +206,11 @@ class _AdminRegisterState extends State<AdminRegister> {
                               if(_controllerpassword.text.length>7&&_controllerpassword.text==_controllerrepassword.text){
                                 await addAndCreateUser();
                               }
+                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                             }
+                            snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                           }
+                          snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                         },
                         style: ElevatedButton.styleFrom(primary: Colors.white),
                         child: const Text(

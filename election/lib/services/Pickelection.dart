@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Admin/AdminHome.dart';
 import 'package:election/pages/Admin/DashBoard.dart';
 import 'package:election/pages/Voter/VoterHome.dart';
@@ -22,8 +23,10 @@ class Pickelec extends StatefulWidget {
 }
 
 class _PickelecState extends State<Pickelec> {
+  //clients
   late Client? httpClient;
   late Web3Client? ethclient;
+  //user
   final User? user = Auth().currentuser;
   Future<void> signOut() async {
     await Auth().signOut();
@@ -34,6 +37,7 @@ class _PickelecState extends State<Pickelec> {
         (route) => false);
   }
 
+//initstate
   @override
   void initState() {
     httpClient = Client();
@@ -44,7 +48,8 @@ class _PickelecState extends State<Pickelec> {
   @override
   Widget build(BuildContext context) {
     if (widget.admin == true) {
-      return Container(
+      //if he is admin cntinue
+      return Container(//for the background
         decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [
           Color(0xFF516395),
@@ -74,45 +79,30 @@ class _PickelecState extends State<Pickelec> {
             title: const Text('Admin Pick Election'),
             backgroundColor: Colors.transparent,
           ),
-          body: Container(
+          body: Container(    ///admin pick election
             child: SingleChildScrollView(
-              child: Column(
+              child: Column(        //colum contains all elements
                 children: [
                   Container(
                     margin: const EdgeInsets.only(bottom: 56),
                     child: SingleChildScrollView(
                       child: StreamBuilder<List>(
-                        stream:
-                            getElectionCounts(ethclient!, contractAdressConst)
-                                .asStream(),
+                        stream: getElectionCounts(ethclient!, contractAdressConst).asStream(),
                         builder: (context, snapshot) {
                           try {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator(),);//returns loading while connecting
                             } else if (snapshot.data![0].toInt() == 0) {
-                              return const Center(
-                                child: Text("no elections for now "),
-                              );
-                            } else {
+                              return const Center(child: Text("no elections for now "),);//if value is zero
+                            } else {   //if there is value
                               return Column(
                                 children: [
-                                  for (int i = 0;
-                                      i < snapshot.data![0].toInt();
-                                      i++)
+                                  for (int i = 0;i < snapshot.data![0].toInt(); i++)//this will run loop
                                     FutureBuilder<List>(
-                                        future: getDeployedElection(
-                                            i, ethclient!, contractAdressConst),
+                                        future: getDeployedElection(i, ethclient!, contractAdressConst),
                                         builder: (context, electionsnapshot) {
-                                          if (electionsnapshot
-                                                  .connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
+                                          if (electionsnapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(child: CircularProgressIndicator(),);
                                           } else {
                                             if (kDebugMode) {
                                               print('${electionsnapshot.data}');
@@ -141,27 +131,13 @@ class _PickelecState extends State<Pickelec> {
                                               child: ListTile(
                                                 tileColor: Colors.transparent,
                                                 onTap: () {
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder:
-                                                              (context) =>
-                                                                  DashBoard(
-                                                                    ethClient:
-                                                                        ethclient!,
-                                                                    electionName:
-                                                                        electionsnapshot.data![0]
-                                                                            [0],
-                                                                    electionaddress: electionsnapshot
-                                                                        .data![
-                                                                            0]
-                                                                            [1]
-                                                                        .toString(),
-                                                                  )),
-                                                      (route) => false);
+                                                  Navigator.pushAndRemoveUntil(context,MaterialPageRoute(
+                                                          builder: (context) => DashBoard(ethClient:ethclient!,
+                                                            electionName:electionsnapshot.data![0][0],
+                                                                    electionaddress: electionsnapshot.data![0][1].toString(),
+                                                                  )), (route) => false);
                                                 },
-                                                title: Text('${electionsnapshot.data![0][0]} ',
-                                                  style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
+                                                title: Text('${electionsnapshot.data![0][0]} ', style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
                                                 subtitle: Text('election $i'),
                                                 trailing: const Icon(Icons.poll_outlined),
                                               ),
@@ -172,7 +148,7 @@ class _PickelecState extends State<Pickelec> {
                               );
                             }
                           } catch (e) {
-                            return Center(
+                            return Center(//if the call gets exception
                               child:
                                   Text("Cannot acess this page for now ${e}"),
                             );
@@ -210,7 +186,7 @@ class _PickelecState extends State<Pickelec> {
                   icon: const Icon(Icons.refresh))
             ],
             title: const Text('Voter Pick Election'),
-            backgroundColor: Colors.cyan,
+            backgroundColor: Colors.transparent,
           ),
           body:  Container(
             child: SingleChildScrollView(
@@ -279,24 +255,13 @@ class _PickelecState extends State<Pickelec> {
                                               child: ListTile(
                                                 tileColor: Colors.transparent,
                                                 onTap: () {
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder:
-                                                              (context) =>
-                                                              DashBoard(
-                                                                ethClient:
-                                                                ethclient!,
-                                                                electionName:
-                                                                electionsnapshot.data![0]
-                                                                [0],
-                                                                electionaddress: electionsnapshot
-                                                                    .data![
-                                                                0]
-                                                                [1]
-                                                                    .toString(),
-                                                              )),
-                                                          (route) => false);
+                                                  checkElecStatus(electionsnapshot.data![0][0]).then((value) => (){
+                                                    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context) =>
+                                                        VoterHome(ethClient: ethclient!,electionName:electionsnapshot.data![0][0],
+                                                          electionaddress: electionsnapshot.data![0][1].toString(), electiondata:electiondata,
+                                                        )),
+                                                            (route) => false);
+                                                  });
                                                 },
                                                 title: Text('${electionsnapshot.data![0][0]} ',
                                                   style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
@@ -325,6 +290,28 @@ class _PickelecState extends State<Pickelec> {
           ),
         ),
       );
+    }
+  }
+
+  List<dynamic> electiondata = [];
+  Future<void>checkElecStatus(String electionName)async {
+    try {
+      final DocumentSnapshot election = await FirebaseFirestore.instance
+          .collection('Election')
+          .doc(electionName)
+          .get();
+      if (election.data() != null) {
+        electiondata[0]=election.get('endedElection');
+        electiondata[1]=election.get('startdate');
+        electiondata[2]=election.get('enddate');
+        electiondata[3]=election.get('state');
+      }else{
+        print('cannot find details');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('get check user ::::: $e');
+      }
     }
   }
   //

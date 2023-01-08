@@ -45,85 +45,101 @@ class _VoterLoginState extends State<VoterLogin> {
   @override
   Widget build(BuildContext context) {
     if(_isloading){
-      return const Scaffold(
-        backgroundColor: Colors.cyan,
-        body: Center(
-          child: CircularProgressIndicator(),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: const Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
         ),
       );
     }
     else{
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "Login Voter",
-            style: TextStyle(
-                color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 24),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              "Login Voter",
+              style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+            ),
           ),
-        ),
-        body: Container(
-          margin: const EdgeInsets.all(16),
-          color: Colors.cyan,
-          child: Center(
-            child: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child:TextField(
-                          controller: _controlleremail,
-                          decoration: const InputDecoration(
-                              hintText: 'Email',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      child:TextField(
-                          controller: _controllerpassword,
-                          decoration: const InputDecoration(
-                              hintText: 'password',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if(_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty){
-                          await signInWithEmailAndPassword();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(primary: Colors.white),
-                      child: const Text(
-                        'Login as Voter',
-                        style: TextStyle(color: Colors.cyan),
+          body: Container(
+            margin: const EdgeInsets.all(16),
+            color: Colors.transparent,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 24,
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 40),
-                      child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => VoterRegister()));
-                          },
-                          child: const Text('Not Registered ?? Click to Register',
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child:TextField(
+                            controller: _controlleremail,
+                            decoration: const InputDecoration(
+                              hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'Email',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child:TextField(
+                            controller: _controllerpassword,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'password',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if(_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty){
+                            await signInWithEmailAndPassword();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(primary: Colors.white),
+                        child: const Text(
+                          'Login as Voter',
+                          style: TextStyle(color: Colors.purple),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 40),
+                        child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => VoterRegister()));
+                            },
+                            child: const Text('Not Registered ?? Click to Register',
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

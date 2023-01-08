@@ -17,7 +17,10 @@ class IntroLogin extends StatefulWidget {
   State<IntroLogin> createState() => _IntroLoginState();
 }
 
-class _IntroLoginState extends State<IntroLogin> {
+class _IntroLoginState extends State<IntroLogin> with SingleTickerProviderStateMixin{
+  //ANIMATION
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
 
   final User? currentuser = Auth().currentuser;//firebase auth current user initialization
    bool isAdmin = false;//if admin this is true
@@ -49,9 +52,11 @@ class _IntroLoginState extends State<IntroLogin> {
   void initState() {
     getUserDetail();
     super.initState();
+    // _controller = AnimationController(vsync:this,duration: const Duration(milliseconds: 1500));
+    // _animation = Tween(begin: const Offset(0.0,8.0),end:const Offset(0.0,5.0))
+    //     .animate(CurvedAnimation(parent: _controller, curve:Curves.easeIn));
+    // _controller.forward();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,55 +79,83 @@ class _IntroLoginState extends State<IntroLogin> {
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 40),
-              child: Column(
-                children: [
-                  Container(
-                      height: 300,
+        body: Center(
+          child: SingleChildScrollView(
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 40),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(color: Color(0xFF7F5A83),
+                              offset: Offset(-4.9, -4.9),
+                              blurRadius: 20,
+                              spreadRadius: 0.0,
+                            ),
+                            BoxShadow(color: Color(0xFF7F5A83),
+                              offset: Offset(4.9, 4.9),
+                              blurRadius: 20,
+                              spreadRadius: 0.0,
+                            ),
+                          ],
+                          borderRadius: BorderRadius.all(Radius.circular(10)),),
                       width: 300,
-                      child: Image.asset('assets/undraw/electionday.png')),
-                  Container(
-                    width: 300,
-                    height: 56,
-                    margin: const EdgeInsets.only(top: 40),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          if(FirebaseAuth.instance.currentUser?.uid == null){
-                            Navigator.push(context,MaterialPageRoute(builder:(context)=>Login()));
-                          } else {
-                            if(isAdmin == true){
-                              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>Pickelec(admin: true)),(route) => false);
-                            }else{
-                              showSnackBar(voterSnack);
+                      height: 56,
+                      margin: const EdgeInsets.only(top: 0),
+                      child: ElevatedButton(
+                        style:ElevatedButton.styleFrom(primary: Colors.white),
+                          onPressed: () {
+                            if(FirebaseAuth.instance.currentUser?.uid == null){
+                              Navigator.push(context,MaterialPageRoute(builder:(context)=>Login()));
+                            } else {
+                              if(isAdmin == true){
+                                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>Pickelec(admin: true)),(route) => false);
+                              }else{
+                                showSnackBar(voterSnack);
+                              }
                             }
-                          }
-                        },
-                        child: const Text('Admin Login')),
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  Container(
-                    height: 56,
-                    width: 300,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          if(FirebaseAuth.instance.currentUser?.uid == null){
-                            Navigator.push(context,MaterialPageRoute(builder:(context)=>VoterLogin()));
-                          } else {
-                            if(isAdmin == false){
-                              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>Pickelec(admin: false)),(route) => false);
-                            }else{
-                              showSnackBar(adminSnack);
+                          },
+                          child: const Text('Admin Login',style: TextStyle(color: Colors.purple),)),
+                    ),
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(color: Color(0xFF7F5A83),
+                              offset: Offset(-4.9, -4.9),
+                              blurRadius: 25,
+                              spreadRadius: 0.0,
+                            ),
+                            BoxShadow(color: Color(0xFF7F5A83),
+                              offset: Offset(4.9, 4.9),
+                              blurRadius: 25,
+                              spreadRadius: 0.0,
+                            ),
+                          ],
+                          borderRadius: BorderRadius.all(Radius.circular(10)),),
+                      height: 56,
+                      width: 300,
+                      child: ElevatedButton(
+                          style:ElevatedButton.styleFrom(primary: Colors.white),
+                          onPressed: () {
+                            if(FirebaseAuth.instance.currentUser?.uid == null){
+                              Navigator.push(context,MaterialPageRoute(builder:(context)=>VoterLogin()));
+                            } else {
+                              if(isAdmin == false){
+                                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>Pickelec(admin: false)),(route) => false);
+                              }else{
+                                showSnackBar(adminSnack);
+                              }
                             }
-                          }
-                        },
-                        child: const Text('Voter Login')),
-                  )
-                ],
+                          },
+                          child: const Text('Voter Login',style: TextStyle(color: Colors.purple))),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

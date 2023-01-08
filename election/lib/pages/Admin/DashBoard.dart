@@ -52,148 +52,186 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.cyan,
-          title:Text('Election : $electionName'),
-          leading: IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              signOut();
-            },
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  refresh();
-                },
-                icon: const Icon(Icons.refresh))
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                margin: const EdgeInsets.only(bottom: 16),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddCandidate(
-                                ethClient: widget.ethClient,
-                                electionName: widget.electionName, electionAdress:electionAddress,)));
+    return Container(
+      decoration:  const BoxDecoration(gradient:
+      LinearGradient(colors: [
+        Color(0xFF516395),
+        Color(0xFF614385 ),
+      ])),
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title:Text('Election : $electionName'),
+            leading: IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                signOut();
+              },
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    refresh();
                   },
-                  child: Card(borderOnForeground: true,elevation: 4,
-                    child: Column(
-                      children: [
-                        Container(height: 200,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: const DecorationImage(
-                                    image: AssetImage('assets/undraw/electionday.png')))),
-                        Container(decoration: BoxDecoration(color: Colors.cyan),width: double.infinity,
-                          child: const Center(
-                            child: Text('Add Candidate',style: TextStyle(
-                                fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(24),
-                margin: const EdgeInsets.only(bottom: 16),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AuthorizeVoter(ethClient:widget.ethClient,electionName:widget.electionName, electionAddress:electionAddress,)));
-                  },
-                  child: Card(borderOnForeground: true,elevation: 4,
-                    child: Column(
-                      children: [
-                        Container(height: 200,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: const DecorationImage(
-                                    image: AssetImage('assets/undraw/upvote.png')))),
-                        Container(decoration: BoxDecoration(color: Colors.cyan),width: double.infinity,
-                          child: const Center(
-                            child: Text('Authorize Voter',style: TextStyle(
-                                fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(24),
-                margin: const EdgeInsets.only(bottom: 16),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ElectionInfo(ethClient:widget.ethClient,electionName:widget.electionName, electionAddress:electionAddress,)));
-                  },
-                  child: Card(borderOnForeground: true,elevation: 4,
-                    child: Column(
-                      children: [
-                        Container(height: 200,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: const DecorationImage(
-                                    image: AssetImage('assets/undraw/appreciation.png')))),
-                        Container(decoration: BoxDecoration(color: Colors.cyan),width: double.infinity,
-                          child: const Center(
-                            child: Text('Election Info',style: TextStyle(
-                                fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(24),
-                margin: const EdgeInsets.only(bottom: 16),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CloseElec(ethClient:widget.ethClient,
-                                electionName: electionName, electionAdress: electionAddress)));
-                  },
-                  child: Card(borderOnForeground: true,elevation: 4,
-                    child: Column(
-                      children: [
-                        Container(height: 200,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: const DecorationImage(
-                                    image: AssetImage('assets/undraw/noted.png')))),
-                        Container(decoration: BoxDecoration(color: Colors.cyan),width: double.infinity,
-                          child: const Center(
-                            child: Text('End election Get Results',style: TextStyle(
-                                fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                  icon: const Icon(Icons.refresh))
             ],
           ),
-        ));
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(),
+                  padding: const EdgeInsets.only(left: 24,right: 24,bottom: 8,top: 8),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddCandidate(
+                                  ethClient: widget.ethClient,
+                                  electionName: widget.electionName, electionAdress:electionAddress,)));
+                    },
+                    child: Card(borderOnForeground: true,elevation: 4,
+                      child: Column(
+                        children: [
+                          Container(height: 200,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: const DecorationImage(
+                                      image: AssetImage('assets/undraw/electionday.png')))),
+                          Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                            child: const Center(
+                              child: Text('Add Candidate',style: TextStyle(
+                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(color: Color(0xFF8693AB),
+                        offset: Offset(-11.9, -11.9),
+                        blurRadius: 39,
+                        spreadRadius: 0.0,
+                      ),
+                      BoxShadow(color: Color(0xFF7F5A83),
+                        offset: Offset(11.9, 11.9),
+                        blurRadius: 39,
+                        spreadRadius: 0.0,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.only(left: 24,right: 24,bottom: 8,top: 4),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AuthorizeVoter(ethClient:widget.ethClient,electionName:widget.electionName, electionAddress:electionAddress,)));
+                    },
+                    child: Card(borderOnForeground: true,elevation: 4,
+                      child: Column(
+                        children: [
+                          Container(height: 200,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: const DecorationImage(
+                                      image: AssetImage('assets/undraw/upvote.png')))),
+                          Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                            child: const Center(
+                              child: Text('Authorize Voter',style: TextStyle(
+                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(color: Color(0xFF8693AB),
+                        offset: Offset(-11.9, -11.9),
+                        blurRadius: 39,
+                        spreadRadius: 0.0,
+                      ),
+                      BoxShadow(color: Color(0xFF7F5A83),
+                        offset: Offset(11.9, 11.9),
+                        blurRadius: 39,
+                        spreadRadius: 0.0,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.only(left: 24,right: 24,bottom: 8,top: 4),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ElectionInfo(ethClient:widget.ethClient,electionName:widget.electionName, electionAddress:electionAddress,)));
+                    },
+                    child: Card(borderOnForeground: true,elevation: 4,
+                      child: Column(
+                        children: [
+                          Container(height: 200,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: const DecorationImage(
+                                      image: AssetImage('assets/undraw/appreciation.png')))),
+                          Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                            child: const Center(
+                              child: Text('Election Info',style: TextStyle(
+                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: const BoxDecoration(),
+                  padding: const EdgeInsets.only(right: 24,left: 24,bottom: 8,top: 4),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CloseElec(ethClient:widget.ethClient,
+                                  electionName: electionName, electionAdress: electionAddress)));
+                    },
+                    child: Card(borderOnForeground: true,elevation: 4,
+                      child: Column(
+                        children: [
+                          Container(height: 200,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: const DecorationImage(
+                                      image: AssetImage('assets/undraw/noted.png')))),
+                          Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                            child: const Center(
+                              child: Text('End election Get Results',style: TextStyle(
+                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
   }
 }

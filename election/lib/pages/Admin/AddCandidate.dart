@@ -102,187 +102,225 @@ class _AddCandidateState extends State<AddCandidate> {
   UploadTask? uploadTask;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.cyan,
-          leading: IconButton(onPressed: () {
-            signOut();
-          }, icon: const Icon(Icons.logout_sharp),),
-          title: const Text('Add Candidate'),
-          actions: [
-            IconButton(onPressed: () {
-              refresh();
-            }, icon: const Icon(Icons.refresh))
-          ],
-        ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(padding: const EdgeInsets.all(24),
-                    child: Form(key: formKey,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 24,),
-                          SelectableText(owner_private_key),
-                          const SizedBox(height: 24,),
-                          InkWell(
-                            onTap: () async {
-                              FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                type: FileType.image,
-                                allowMultiple: false,
-                              );
+    return Container(
+      decoration:  const BoxDecoration(gradient:
+      LinearGradient(colors: [
+        Color(0xFF516395),
+        Color(0xFF614385 ),
+      ])),
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            leading: IconButton(onPressed: () {
+              signOut();
+            }, icon: const Icon(Icons.logout_sharp),),
+            title: const Text('Add Candidate',style: TextStyle(color: Colors.white),),
+            actions: [
+              IconButton(onPressed: () {
+                refresh();
+              }, icon: const Icon(Icons.refresh))
+            ],
+          ),
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(padding: const EdgeInsets.all(24),
+                      child: Form(key: formKey,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 24,),
+                            SelectableText(owner_private_key),
+                            const SizedBox(height: 24,),
+                            InkWell(
+                              onTap: () async {
+                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                  type: FileType.image,
+                                  allowMultiple: false,
+                                );
 
-                              if (result != null) {
-                                PlatformFile file = result.files.first;
-                                filetodisplay = File(file.path.toString());
-                                String filename = file.name.toString();
-                                isselected=true;
-                                refresh();
+                                if (result != null) {
+                                  PlatformFile file = result.files.first;
+                                  filetodisplay = File(file.path.toString());
+                                  String filename = file.name.toString();
+                                  isselected=true;
+                                  refresh();
 
-                                if (kDebugMode) {
-                                  print(file.name);
-                                  print(file.bytes);
-                                  print(file.size);
-                                  print(file.extension);
-                                  print(file.path);
+                                  if (kDebugMode) {
+                                    print(file.name);
+                                    print(file.bytes);
+                                    print(file.size);
+                                    print(file.extension);
+                                    print(file.path);
+                                  }
+                                } else {
+                                  isselected=false;
+                                  // User canceled the picker
                                 }
+                              },
+                              child: SizedBox(height:100 ,width: 100,
+                                child: ClipRRect(borderRadius:BorderRadius.circular(100),child:Image(image:isselected?Image.file(filetodisplay!).image:
+                                const AssetImage('assets/undraw/electionday.png'),fit:BoxFit.fill,),),
+                              ),
+                            ),
+                            const SizedBox(height: 8,),
+                            const Text('Picture of candidate',style: TextStyle(fontSize:16,color: Colors.white),),
+                            const SizedBox(height: 8,),
+                            Container(padding: const EdgeInsets.all(8),
+                              child: TextFormField(
+                                validator: (value){
+                                  if(value == null||value.isEmpty){
+                                    return 'please enter the details';
+                                  }
+                                  return null;
+                                },
+                                controller: candidateNameController,
+                                decoration: const InputDecoration(
+                                    hintStyle: TextStyle(color: Colors.white),
+                                    hintText: 'Enter Candidate Name',border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8)))
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4,),
+                            Container(padding: const EdgeInsets.all(8),
+                              child: TextFormField(
+                                validator: (value){
+                                if(value == null||value.isEmpty){
+                                return 'please enter the details';
+                                }
+                                return null;
+                                },
+                                controller: candidateAdharController,
+                                decoration: const InputDecoration(
+                                    hintStyle: TextStyle(color: Colors.white),
+                                    hintText: 'Enter Candidate Adhar Num',border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8)))
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4,),
+                            const SizedBox(height: 8,),
+                            ListPickerField(label:'party of candidate',
+                              items:party,controller:selectpartycontroller,),
+                            const SizedBox(height: 8,),
+                            Container(padding: const EdgeInsets.all(16),
+                              child: TextFormField(
+                                validator: (value){
+                                  if(value == null||value.isEmpty){
+                                    return 'please enter the details';
+                                  }
+                                  return null;
+                                },
+                                controller: AdminmtmskController,
+                                decoration: const InputDecoration(
+                                    hintStyle: TextStyle(color: Colors.white),
+                                    hintText: 'Enter admins metamask private key',border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8)))
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24,),
+                            buildProgress(),
+                            const SizedBox(height: 4,),
+                            ElevatedButton(
+                                onPressed: () async {
+                              if (formKey.currentState!.validate()&&filetodisplay!=null){
+                                await getAdharVerified(candidateAdharController.text);
+                                  if (_adharage >= 18) {
+                                    await uploadimageAndData().then((value) => {
+                                     addCandidate(candidateNameController.text, widget.ethClient, AdminmtmskController.text, widget.electionAdress),
+                                  //  candidateAdharController.clear(),candidateNameController.clear(),selectpartycontroller.clear(),
+                                    });
+
+                                  } else {
+                                    snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
+                                  }
                               } else {
-                                isselected=false;
-                                // User canceled the picker
+                                snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                               }
                             },
-                            child: SizedBox(height:100 ,width: 100,
-                              child: ClipRRect(borderRadius:BorderRadius.circular(100),child:Image(image:isselected?Image.file(filetodisplay!).image:
-                              const AssetImage('assets/undraw/electionday.png'),fit:BoxFit.fill,),),
-                            ),
-                          ),
-                          const SizedBox(height: 8,),
-                          const Text('Picture of candidate',style: TextStyle(fontSize:16,),),
-                          const SizedBox(height: 8,),
-                          Container(padding: const EdgeInsets.all(8),
-                            child: TextFormField(
-                              validator: (value){
-                                if(value == null||value.isEmpty){
-                                  return 'please enter the details';
-                                }
-                                return null;
-                              },
-                              controller: candidateNameController,
-                              decoration: const InputDecoration(
-                                  hintText: 'Enter Candidate Name',border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8)))
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4,),
-                          Container(padding: const EdgeInsets.all(8),
-                            child: TextFormField(
-                              validator: (value){
-                              if(value == null||value.isEmpty){
-                              return 'please enter the details';
-                              }
-                              return null;
-                              },
-                              controller: candidateAdharController,
-                              decoration: const InputDecoration(
-                                  hintText: 'Enter Candidate Adhar Num',border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8)))
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4,),
-                          const SizedBox(height: 8,),
-                          ListPickerField(label: 'party of candidate', items:party,controller:selectpartycontroller,),
-                          const SizedBox(height: 8,),
-                          Container(padding: const EdgeInsets.all(16),
-                            child: TextFormField(
-                              validator: (value){
-                                if(value == null||value.isEmpty){
-                                  return 'please enter the details';
-                                }
-                                return null;
-                              },
-                              controller: AdminmtmskController,
-                              decoration: const InputDecoration(
-                                  hintText: 'Enter admins metamask private key',border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8)))
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24,),
-                          buildProgress(),
-                          const SizedBox(height: 4,),
-                          ElevatedButton(onPressed: () async {
-                            if (formKey.currentState!.validate()&&filetodisplay!=null){
-                              await getAdharVerified(candidateAdharController.text);
-                                if (_adharage >= 18) {
-                                  await uploadimageAndData().then((value) => {
-                                   addCandidate(candidateNameController.text, widget.ethClient, AdminmtmskController.text, widget.electionAdress),
-                                //  candidateAdharController.clear(),candidateNameController.clear(),selectpartycontroller.clear(),
-                                  });
-
-                                } else {
-                                  snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
-                                }
+                                style: ElevatedButton.styleFrom(primary: Colors.white),
+                                child: const Text('Add Candidate',style: TextStyle(color: Colors.purple),))
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(thickness: 2,color: Colors.purple,),
+                    Container(margin: const EdgeInsets.only(bottom: 56,left:8,),
+                      child: SingleChildScrollView(
+                        child: StreamBuilder<List>(stream: getCandidatesNum(
+                            widget.ethClient, widget.electionAdress).asStream(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             } else {
-                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
-                            }
-                          }, child: const Text('Add Candidate'))
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Divider(thickness: 2,color: Colors.cyan,),
-                  Container(margin: const EdgeInsets.only(bottom: 56,left:8,),
-                    child: SingleChildScrollView(
-                      child: StreamBuilder<List>(stream: getCandidatesNum(
-                          widget.ethClient, widget.electionAdress).asStream(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                for (int i = 0; i < snapshot.data![0].toInt(); i++)
-                                  FutureBuilder<List>(
-                                      future: candidateInfo(i, widget.ethClient,
-                                          widget.electionAdress),
-                                      builder: (context, candidatesnapshot) {
-                                        if (candidatesnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        } else {
-                                          if (kDebugMode) {
-                                            print(candidatesnapshot.data);
+                              return Column(
+                                children: [
+                                  for (int i = 0; i < snapshot.data![0].toInt(); i++)
+                                    FutureBuilder<List>(
+                                        future: candidateInfo(i, widget.ethClient,
+                                            widget.electionAdress),
+                                        builder: (context, candidatesnapshot) {
+                                          if (candidatesnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(),
+                                            );
+                                          } else {
+                                            if (kDebugMode) {
+                                              print(candidatesnapshot.data);
+                                            }
+                                            return Container(
+                                              padding: const EdgeInsets.all(12),
+                                              margin: const EdgeInsets.all(12),
+                                              decoration: const BoxDecoration(
+                                                  boxShadow: [
+                                                    BoxShadow(color: Color(0xFF7F5A83),
+                                                      offset: Offset(-11.9, -11.9),
+                                                      blurRadius: 39,
+                                                      spreadRadius: 0.0,
+                                                    ),
+                                                    BoxShadow(color: Color(0xFF7F5A83),
+                                                      offset: Offset(11.9, 11.9),
+                                                      blurRadius: 39,
+                                                      spreadRadius: 0.0,
+                                                    ),
+                                                  ],
+                                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                  gradient: LinearGradient(colors: [
+                                                    Color(0xFF74F2CE),
+                                                    Color(0xFF7CFFCB),
+                                                  ])),
+                                              child: ListTile(
+                                                title: Text('Name: ${candidatesnapshot.data![0][0]}',
+                                                  style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
+                                                subtitle: Text('Votes: ${candidatesnapshot.data![0][1]}',
+                                                  style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
+                                              ),
+                                            );
                                           }
-                                          return ListTile(
-                                            title: Text('Name: ${candidatesnapshot.data![0][0]}'),
-                                            subtitle: Text('Votes: ${candidatesnapshot.data![0][1]}'),
-                                          );
-                                        }
-                                      })
-                              ],
-                            );
-                          }
-                        },
+                                        })
+                                ],
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        )
+            ],
+          )
+      ),
     );
   }
   Future<void> uploadimageAndData() async{

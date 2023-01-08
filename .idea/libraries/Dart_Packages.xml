@@ -527,6 +527,13 @@
             </list>
           </value>
         </entry>
+        <entry key="simple_animations">
+          <value>
+            <list>
+              <option value="$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/simple_animations-5.0.0+3/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="sky_engine">
           <value>
             <list>
@@ -714,6 +721,7 @@
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_platform_interface-2.1.0/lib" />
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_web-2.0.4/lib" />
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_windows-2.1.2/lib" />
+      <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/simple_animations-5.0.0+3/lib" />
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.2/lib" />
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.10.0/lib" />
       <root url="file://$APPLICATION_HOME_DIR$/flutter/.pub-cache/hosted/pub.dartlang.org/stream_channel-2.1.0/lib" />

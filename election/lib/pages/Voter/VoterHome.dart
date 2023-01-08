@@ -10,6 +10,7 @@ import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../services/Auth.dart';
+import '../../services/snackbar.dart';
 import '../../utils/Constants.dart';
 import '../../services/Electioninfo.dart';
 import '../../services/VerifyEmail.dart';
@@ -19,7 +20,8 @@ class VoterHome extends StatefulWidget {
   final Web3Client ethClient;
   final String electionName;
   final String electionaddress;
-  const VoterHome({Key? key, required this.ethClient, required this.electionName, required this.electionaddress}) : super(key: key);
+  final List<dynamic> electiondata;
+  const VoterHome({Key? key, required this.ethClient, required this.electionName, required this.electionaddress, required this.electiondata}) : super(key: key);
 
   @override
   State<VoterHome> createState() => _VoterHomeState();
@@ -41,6 +43,7 @@ class _VoterHomeState extends State<VoterHome> {
    var adhar;
    var name;
    var phone;
+   var state;
 
   //checking if voter authorized or voted   // dont have to do this because we does this on the respected pages
   late bool isAuth = false;//if  he is authorized
@@ -56,6 +59,7 @@ class _VoterHomeState extends State<VoterHome> {
         name = voters.get('name');
         phone = voters.get('phone');
         adhar = voters.get('adharnum');
+        state = voters.get('state');
         print('adhar is $adhar');
 
       }else{
@@ -85,141 +89,166 @@ class _VoterHomeState extends State<VoterHome> {
   Widget build(BuildContext context) {
     Map<String,dynamic> voterdata = {'name':name,'adharnum':adhar.toString(),'email':email,};
     if(user!.emailVerified){
-      return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
-            actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
-            title: const Text('Voter DASHBOARD'),backgroundColor: Colors.cyan,),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: InkWell(
-                    onTap: () {
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(onPressed: () { signOut(); }, icon: const Icon(Icons.logout),),
+              actions: [IconButton(onPressed:(){setState(() {});}, icon: const Icon(Icons.refresh))],
+              title: const Text('Voter DASHBOARD'),backgroundColor: Colors.transparent,),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {
+                        String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
+                        if(widget.electiondata[0] == false){
+                          if(widget.electiondata[1].toInt()<int.parse(now)&&widget.electiondata[2].toInt()>int.parse(now)){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => VoteRegister(electionName:widget.electionName,
+                                        ethClient: widget.ethClient, electionaddress:widget.electionaddress,adhar:adhar,
+                                        electiondata: widget.electiondata,)));
+                          }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                        }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                      },
+                      child: Card(borderOnForeground: true,elevation: 4,
+                        child: Column(
+                          children: [
+                            Container(height: 200,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: const DecorationImage(
+                                        image: AssetImage('assets/undraw/electionday.png')))),
+                            Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                              child: const Center(
+                                child: Text('Register to Vote',style: TextStyle(
+                                    fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {
+                        String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
+                        if(widget.electiondata[0] == false){
+                          if(widget.electiondata[1].toInt()<int.parse(now)&&widget.electiondata[2].toInt()>int.parse(now)){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => VoterVote(ethClient:ethclient!,electionName:widget.electionName,
+                                      electionaddress:widget.electionaddress ,votermap:voterdata, electiondata:widget.electiondata,)));
+                          }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                        }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                      },
+                      child: Card(borderOnForeground: true,elevation: 4,
+                        child: Column(
+                          children: [
+                            Container(height: 200,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: const DecorationImage(
+                                        image: AssetImage('assets/undraw/upvote.png')))),
+                            Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                              child: const Center(
+                                child: Text('Vote',style: TextStyle(fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => VoteRegister(electionName:widget.electionName,
-                                  ethClient: widget.ethClient, electionaddress:widget.electionaddress,adhar:adhar,)));
-                    },
-                    child: Card(borderOnForeground: true,elevation: 4,
-                      child: Column(
-                        children: [
-                          Container(height: 200,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  image: const DecorationImage(
-                                      image: AssetImage('assets/undraw/electionday.png')))),
-                          Container(decoration: const BoxDecoration(color: Colors.cyan),width: double.infinity,
-                            child: const Center(
-                              child: Text('Register to Vote',style: TextStyle(
-                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                            ),
-                          )
-                        ],
+                                builder: (context) => ElectionInfo(ethClient:ethclient!,electionName:widget.electionName,
+                                  electionAddress:widget.electionaddress,)));
+                      },
+                      child: Card(borderOnForeground: true,elevation: 4,
+                        child: Column(
+                          children: [
+                            Container(height: 200,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: const DecorationImage(
+                                        image: AssetImage('assets/undraw/electionday.png')))),
+                            Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                              child: const Center(
+                                child: Text('Election details',style: TextStyle(
+                                    fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: InkWell(
-                    onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => VoterVote(ethClient:ethclient!,electionName:widget.electionName,
-                                  electionaddress:widget.electionaddress ,votermap:voterdata,)));
-                    },
-                    child: Card(borderOnForeground: true,elevation: 4,
-                      child: Column(
-                        children: [
-                          Container(height: 200,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  image: const DecorationImage(
-                                      image: AssetImage('assets/undraw/upvote.png')))),
-                          Container(decoration: const BoxDecoration(color: Colors.cyan),width: double.infinity,
-                            child: const Center(
-                              child: Text('Vote',style: TextStyle(fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ElectionInfo(ethClient:ethclient!,electionName:widget.electionName,
-                                electionAddress:widget.electionaddress,)));
-                    },
-                    child: Card(borderOnForeground: true,elevation: 4,
-                      child: Column(
-                        children: [
-                          Container(height: 200,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  image: const DecorationImage(
-                                      image: AssetImage('assets/undraw/electionday.png')))),
-                          Container(decoration: const BoxDecoration(color: Colors.cyan),width: double.infinity,
-                            child: const Center(
-                              child: Text('Election details',style: TextStyle(
-                                  fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
+                ],
+              ),
+            )
+        ),
       );
     }else{
-      return Scaffold(
-        appBar:AppBar( ///app bar
-          backgroundColor: Colors.cyan,
-          leading: IconButton(
-            onPressed: () {
-              signOut();
-            },
-            icon: const Icon(Icons.logout_sharp),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+          appBar:AppBar( ///app bar
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              onPressed: () {
+                signOut();
+              },
+              icon: const Icon(Icons.logout_sharp),
+            ),
+            title: const Text('Verify Voter email'),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    refresh();
+                  },
+                  icon: const Icon(Icons.refresh))
+            ],
           ),
-          title: const Text('Verify Voter email'),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  refresh();
-                },
-                icon: const Icon(Icons.refresh))
-          ],
-        ),
-        body: Container(margin: const EdgeInsets.only(top: 56),
-          child: Center(
-            child: Column(
-              children: [
-                Text('Your Email ${user?.email} is not verified'),
-                const SizedBox(height: 24,),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const VerifyEmail()),
-                              (route) => false);
-                    },
-                    child: const Text('Verify Email'))
-              ],
+          body: Container(margin: const EdgeInsets.only(top: 56),
+            child: Center(
+              child: Column(
+                children: [
+                  Text('Your Email ${user?.email} is not verified'),
+                  const SizedBox(height: 24,),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const VerifyEmail()),
+                                (route) => false);
+                      },
+                      child: const Text('Verify Email'))
+                ],
+              ),
             ),
           ),
         ),

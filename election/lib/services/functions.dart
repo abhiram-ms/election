@@ -59,10 +59,10 @@ Future<List<dynamic>> ask(String funcName, List<dynamic> args, Web3Client ethCli
 
 //add candidate function
 Future<String> addCandidate(String name, Web3Client ethClient,String adminprivatekey,String contractAdressOwner) async {
-  var response =
-  await callFunction('addCandidate', [name], ethClient, adminprivatekey,contractAdressOwner,false);
-  print('Candidate added successfully');
-  return response;
+    var response =
+    await callFunction('addCandidate', [name], ethClient, adminprivatekey,contractAdressOwner,false);
+    print('Candidate added successfully');
+    return response;
 }
 
 //authorize voter

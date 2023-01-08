@@ -39,6 +39,7 @@ dependencies:
   list_picker: ^1.0.0
   file_picker: ^5.2.4
   firebase_storage: ^11.0.10
+  simple_animations: ^5.0.0+3
 
 dev_dependencies:
   flutter_test:

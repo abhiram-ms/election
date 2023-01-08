@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Voter/VoterHome.dart';
 import 'package:election/services/Pickelection.dart';
+import 'package:election/services/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -83,135 +84,160 @@ class _VoterRegisterState extends State<VoterRegister> {
   @override
   Widget build(BuildContext context) {
     if(_isloading){
-      return const Scaffold(
-        backgroundColor: Colors.cyan,
-        body: Center(
-          child: CircularProgressIndicator(),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: const Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
         ),
       );
     }else{
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "Register Voter",
-            style: TextStyle(
-                color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 24),
+      return Container(
+        decoration:  const BoxDecoration(gradient:
+        LinearGradient(colors: [
+          Color(0xFF516395),
+          Color(0xFF614385 ),
+        ])),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              "Register Voter",
+              style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+            ),
           ),
-        ),
-        body: Container(
-          margin: const EdgeInsets.all(16),
-          color: Colors.cyan,
-          child: Center(
-            child: SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controllerName,
-                          decoration: const InputDecoration(
-                              hintText: 'Name',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controlleremail,
-                          decoration: const InputDecoration(
-                              hintText: 'email id',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controlleradhar,
-                          decoration: const InputDecoration(
-                              hintText: 'enter your adhar number',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controllerphone,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                              hintText: 'phone number in your adhar',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controllerpassword,
-                          decoration: const InputDecoration(
-                              hintText: 'password',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: TextField(
-                          controller: _controllerrepassword,
-                          decoration: const InputDecoration(
-                              hintText: 'Re enter password',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))))),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty) {
-                          if(_controllerName.text.isNotEmpty){
-                            if(_controllerphone.text.isNotEmpty&&_controllerpassword.text==_controllerrepassword.text){
-                              if(_controllerpassword.text.length>7){
-                                await createUserWithEmailAndPassword();
-                                await addUser();
-                              }
-                            }
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(primary: Colors.white),
-                      child: const Text(
-                        'Register as Voter',
-                        style: TextStyle(color: Colors.cyan),
+          body: Container(
+            margin: const EdgeInsets.all(16),
+            color: Colors.transparent,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 24,
                       ),
-                    )
-                  ],
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controllerName,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'Name',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controlleremail,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'email id',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controlleradhar,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'enter your adhar number',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controllerphone,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'phone number in your adhar',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controllerpassword,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'password',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                            controller: _controllerrepassword,
+                            decoration: const InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                hintText: 'Re enter password',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(8))))),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty) {
+                            if(_controllerName.text.isNotEmpty){
+                              if(_controllerphone.text.isNotEmpty&&_controllerpassword.text==_controllerrepassword.text){
+                                if(_controllerpassword.text.length>7){
+                                  await createUserWithEmailAndPassword().then((value) => () async {
+                                    await addUser();
+                                  });
+                                }
+                                snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                              }
+                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                            }
+                            snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                          }
+                          snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                        },
+                        style: ElevatedButton.styleFrom(primary: Colors.white),
+                        child: const Text(
+                          'Register as Voter',
+                          style: TextStyle(color: Colors.purple),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

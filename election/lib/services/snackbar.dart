@@ -10,4 +10,28 @@ class snackbarshow {
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(SnackBar snackBar,BuildContext context) {
     return ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+  SnackBar errorStartelection = const SnackBar(content: Text('There was an error from our side we are sorry'));
+
+  SnackBar errorstate = const SnackBar(content: Text('This election doesnt fit your state'));
+  SnackBar endedelection = const SnackBar(content: Text('cannot acess the election it may be ended'));
+}
+
+class Loadingbar {
+
+  Widget loadbarfunction(){
+    return Container(
+      decoration:  const BoxDecoration(gradient:
+      LinearGradient(colors: [
+        Color(0xFF516395),
+        Color(0xFF614385 ),
+      ])),
+      child: const Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
 }
