@@ -12,13 +12,13 @@ import '../../services/functions.dart';
 import '../../services/IntoLogin.dart';
 
 class VoterVote extends StatefulWidget {
-  final Web3Client ethClient;
-  final String electionName;
-  final String electionaddress;
-  final List<dynamic> electiondata;
-  final  votermap;
+  final Web3Client? ethClient;
+  final String? electionName;
+  final String? electionaddress;
+  final List<dynamic>? electiondata;
+  final Map<String,dynamic>?  votermap;
   const VoterVote({Key? key, required this.ethClient, required this.electionName,
-    required this.electionaddress, this.votermap, required this.electiondata,}) : super(key: key);
+    required this.electionaddress, required this.votermap, required this.electiondata,}) : super(key: key);
 
   @override
   State<VoterVote> createState() => _VoterVoteState();
@@ -48,7 +48,7 @@ class _VoterVoteState extends State<VoterVote> {
     try {
       final DocumentSnapshot voters = await FirebaseFirestore.instance
           .collection('Election')
-          .doc(widget.electionName).collection('voterAuth').doc(voterdetails['adharnum'])
+          .doc(widget.electionName).collection('voterAuth').doc(voterdetails!['adharnum'])
           .get();
       if (voters.data() != null) {
         isAuth = voters.get('isAuth');
@@ -136,7 +136,7 @@ class _VoterVoteState extends State<VoterVote> {
                   ),
                   const SizedBox(height: 24,),
                   SingleChildScrollView(
-                    child: StreamBuilder<List>(stream:getCandidatesNum(widget.ethClient,widget.electionaddress).asStream(),
+                    child: StreamBuilder<List>(stream:getCandidatesNum(widget.ethClient!,widget.electionaddress!).asStream(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(
@@ -147,7 +147,7 @@ class _VoterVoteState extends State<VoterVote> {
                             children: [
                               for (int i = 0; i < snapshot.data![0].toInt(); i++)
                                 FutureBuilder<List>(
-                                    future: candidateInfo(i, widget.ethClient,widget.electionaddress),
+                                    future: candidateInfo(i, widget.ethClient!,widget.electionaddress!),
                                     builder: (context, candidatesnapshot) {
                                       if (candidatesnapshot.connectionState ==
                                           ConnectionState.waiting) {
@@ -264,7 +264,7 @@ class _VoterVoteState extends State<VoterVote> {
   Future<void> registerAuth() async {
     var voterdetails = widget.votermap;
     try {
-      await FirebaseFirestore.instance.collection('Election').doc(widget.electionName).collection('voterAuth').doc(voterdetails['adharnum']).update({'isVoted':true});
+      await FirebaseFirestore.instance.collection('Election').doc(widget.electionName).collection('voterAuth').doc(voterdetails!['adharnum']).update({'isVoted':true});
       print('updated data aaaaaaaaaaaaaaa');
     } catch (e) {
       if (kDebugMode) {
@@ -277,7 +277,7 @@ class _VoterVoteState extends State<VoterVote> {
         electionName: widget.electionName, electionaddress: widget.electionaddress, electiondata: [],)), (route) => false);
   }
    votebigFunction(int i)async{
-    await vote(i,widget.ethClient,privatekeyController.text,widget.electionaddress);
+    await vote(i,widget.ethClient!,privatekeyController.text,widget.electionaddress!);
     await registerAuth();
     gotoDashboard();
   }

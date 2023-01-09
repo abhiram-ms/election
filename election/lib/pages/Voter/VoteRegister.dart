@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Voter/VoterHome.dart';
 import 'package:election/utils/Constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:web3dart/web3dart.dart';
@@ -11,11 +9,11 @@ import '../../services/Auth.dart';
 import '../../services/IntoLogin.dart';
 
 class VoteRegister extends StatefulWidget {
-  final Web3Client ethClient;
-  final String electionName;
-  final String electionaddress;
-  final List<dynamic>electiondata;
-  final String adhar;
+  final Web3Client? ethClient;
+  final String? electionName;
+  final String? electionaddress;
+  final List<dynamic>? electiondata;
+  final String? adhar;
   const VoteRegister({Key? key, required this.ethClient, required this.electionName,
     required this.electionaddress, required this.adhar, required this.electiondata,}) : super(key: key);
 
@@ -51,11 +49,18 @@ class _VoteRegisterState extends State<VoteRegister> {
       if (voters.data() != null) {
         isAuth = voters.get('isAuth');
         isVoted = voters.get('isVoted');
-        print('is auth is :$isAuth && is voted is : $isVoted');
+        if (kDebugMode) {
+          print('is auth is :$isAuth && is voted is : $isVoted');
+        }
       }else{
         isAuth = false;
         isVoted = false;
-        print('cannot find details');
+        if (kDebugMode) {
+          print(isAuth);
+        }
+        if (kDebugMode) {
+          print('cannot find details');
+        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -145,12 +150,12 @@ class _VoteRegisterState extends State<VoteRegister> {
                   ),
                   const SizedBox(height: 24,),
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(primary: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                       onPressed: () async {
                         if(voterAdress.text.isNotEmpty){
                           if(voterName.text.isNotEmpty&&voterAge.text.isNotEmpty) {
                             try{
-                              await registerVoterAuthorize(widget.adhar,voterAdress.text,voterName.text,voterAge.text,user?.email);
+                              await registerVoterAuthorize(widget.adhar!,voterAdress.text,voterName.text,voterAge.text,user?.email);
                               showSnackBar(succesRegisterSnack);
                               gotoDashboard();
                             }catch(e){
@@ -174,11 +179,14 @@ class _VoteRegisterState extends State<VoteRegister> {
 
   Future<void> registerVoterAuthorize(String adharnum,String voterAdress,String voterName,String voterAge,String? email) async {
     try {
-      final CollectionReference VoterAuth = await FirebaseFirestore.instance.collection('Election')
+      final CollectionReference voterAuth = FirebaseFirestore.instance.collection('Election')
           .doc(widget.electionName).collection('voterAuth');
-      await VoterAuth.doc(adharnum).set({
-        "adharnum":adharnum,"isVoted":false,"isAuth":false,"voterAddress":voterAdress,"voterName":voterName,"voterAge":voterAge,"email":email});
-      print('user added successfullyyyyyyy');
+      await voterAuth.doc(adharnum).set({
+        "adharnum":adharnum,"isVoted":false,"isAuth":false,
+        "voterAddress":voterAdress,"voterName":voterName,"voterAge":voterAge,"email":email});
+      if (kDebugMode) {
+        print('user added successfullyyyyyyy');
+      }
       showSnackBar(succesRegisterSnack);
     } catch (e) {
       if (kDebugMode) {
@@ -197,8 +205,8 @@ class _VoteRegisterState extends State<VoteRegister> {
 
   void gotoDashboard(){
     Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>
-        VoterHome(ethClient:widget.ethClient, electionName:widget.electionName, electionaddress:widget.electionaddress,
-          electiondata:widget.electiondata,)), (route) => false);
+        VoterHome(ethClient:widget.ethClient!, electionName:widget.electionName!, electionaddress:widget.electionaddress!,
+          electiondata:widget.electiondata!,)), (route) => false);
   }
 
 }

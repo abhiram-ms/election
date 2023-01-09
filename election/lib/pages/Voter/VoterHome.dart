@@ -1,9 +1,9 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/services/IntoLogin.dart';
 import 'package:election/pages/Voter/Vote.dart';
 import 'package:election/pages/Voter/VoteRegister.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -17,10 +17,10 @@ import '../../services/VerifyEmail.dart';
 
 class VoterHome extends StatefulWidget {
   //getting required parameters to pass on to vote and authorize
-  final Web3Client ethClient;
-  final String electionName;
-  final String electionaddress;
-  final List<dynamic> electiondata;
+  final Web3Client? ethClient;
+  final String? electionName;
+  final String? electionaddress;
+  final List<dynamic>? electiondata;
   const VoterHome({Key? key, required this.ethClient, required this.electionName, required this.electionaddress, required this.electiondata}) : super(key: key);
 
   @override
@@ -39,15 +39,15 @@ class _VoterHomeState extends State<VoterHome> {
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>IntroLogin()), (route) => false);
   }
  // voters info
-   var email;
-   var adhar;
-   var name;
-   var phone;
-   var state;
+   String? email;
+   String? adhar;
+   String? name;
+   String? phone;
+   String? state;
 
   //checking if voter authorized or voted   // dont have to do this because we does this on the respected pages
-  late bool isAuth = false;//if  he is authorized
-  late  bool isVoted = false;//if he is voted
+  // late bool isAuth = false;//if  he is authorized
+  // late  bool isVoted = false;//if he is voted
   Future<void>getUserDetail() async {
     try {
       final DocumentSnapshot voters = await FirebaseFirestore.instance
@@ -60,10 +60,14 @@ class _VoterHomeState extends State<VoterHome> {
         phone = voters.get('phone');
         adhar = voters.get('adharnum');
         state = voters.get('state');
-        print('adhar is $adhar');
+        if (kDebugMode) {
+          print('adhar is $adhar');
+        }
 
       }else{
-        print('cannot find details');
+        if (kDebugMode) {
+          print('cannot find details');
+        }
       }
       showSnackBar(succesdetailsnackSnack);
     } catch (e) {
@@ -87,8 +91,10 @@ class _VoterHomeState extends State<VoterHome> {
   }
   @override
   Widget build(BuildContext context) {
+
     Map<String,dynamic> voterdata = {'name':name,'adharnum':adhar.toString(),'email':email,};
-    if(user!.emailVerified){
+
+    if(user!.emailVerified){   //if the email is verified for the user
       return Container(
         decoration:  const BoxDecoration(gradient:
         LinearGradient(colors: [
@@ -109,16 +115,16 @@ class _VoterHomeState extends State<VoterHome> {
                     child: InkWell(
                       onTap: () {
                         String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
-                        if(widget.electiondata[0] == false){
-                          if(widget.electiondata[1].toInt()<int.parse(now)&&widget.electiondata[2].toInt()>int.parse(now)){
+                        if(widget.electiondata![0] == false){
+                          if(int.parse(widget.electiondata![1])<int.parse(now)&& int.parse(widget.electiondata![2])>int.parse(now)){
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => VoteRegister(electionName:widget.electionName,
-                                        ethClient: widget.ethClient, electionaddress:widget.electionaddress,adhar:adhar,
-                                        electiondata: widget.electiondata,)));
-                          }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
-                        }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                                      builder: (context) => VoteRegister(electionName:widget.electionName!,
+                                        ethClient: widget.ethClient!, electionaddress:widget.electionaddress!,adhar:adhar!,
+                                        electiondata: widget.electiondata!,)));
+                          }else{snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
+                        }else{snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
                       },
                       child: Card(borderOnForeground: true,elevation: 4,
                         child: Column(
@@ -145,15 +151,15 @@ class _VoterHomeState extends State<VoterHome> {
                     child: InkWell(
                       onTap: () {
                         String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
-                        if(widget.electiondata[0] == false){
-                          if(widget.electiondata[1].toInt()<int.parse(now)&&widget.electiondata[2].toInt()>int.parse(now)){
+                        if(widget.electiondata![0] == false){
+                          if(int.parse(widget.electiondata![1])<int.parse(now)&& int.parse(widget.electiondata![2])>int.parse(now)){
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VoterVote(ethClient:ethclient!,electionName:widget.electionName,
-                                      electionaddress:widget.electionaddress ,votermap:voterdata, electiondata:widget.electiondata,)));
-                          }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
-                        }snackbarshow().showSnackBar(snackbarshow().endedelection, context);
+                                    builder: (context) => VoterVote(ethClient:ethclient!,electionName:widget.electionName!,
+                                      electionaddress:widget.electionaddress! ,votermap:voterdata, electiondata:widget.electiondata!,)));
+                          }else {snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
+                        }else {snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
                       },
                       child: Card(borderOnForeground: true,elevation: 4,
                         child: Column(
@@ -181,8 +187,8 @@ class _VoterHomeState extends State<VoterHome> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ElectionInfo(ethClient:ethclient!,electionName:widget.electionName,
-                                  electionAddress:widget.electionaddress,)));
+                                builder: (context) => ElectionInfo(ethClient:ethclient!,electionName:widget.electionName!,
+                                  electionAddress:widget.electionaddress!,)));
                       },
                       child: Card(borderOnForeground: true,elevation: 4,
                         child: Column(
@@ -263,7 +269,7 @@ class _VoterHomeState extends State<VoterHome> {
   SnackBar errordetailsnackSnack = const SnackBar(content: Text('You are not logged in if you are please check your internet connection'));
   SnackBar succesdetailsnackSnack = const SnackBar(content: Text('successfull'));
   SnackBar votedSnack = const SnackBar(content: Text('You have already voted'));
-  SnackBar RegisterSnack = const SnackBar(content: Text('You have already registered'));
+  SnackBar registerSnack = const SnackBar(content: Text('You have already registered'));
   // SnackBar errorSnack = const SnackBar(content: Text('Fill all the details'));
   // SnackBar datanullSnack = const SnackBar(content: Text('No users registerd yet'));
   //function to show snackbar

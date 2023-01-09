@@ -126,3 +126,12 @@ Future<String> createElection(String name, Web3Client ethClient, String adminpri
   print('Election started successfully');
   return response;
 }
+
+//close election
+Future<String> closeElection( Web3Client ethClient, String adminprivatekey,String contractAdressOwner) async {
+  var response =
+  await callFunction('closeElection', [], ethClient, adminprivatekey,contractAdressOwner,true);    ////faaactoryyyyyyyyyyyyy
+  print('election ended successfully');
+  return response;
+}
+

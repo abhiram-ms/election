@@ -35,6 +35,11 @@ late int winnervotes = 0;
 late int row = 5;
 late int col = 5;
 var candidatearray = [] ;
+@override
+  void initState() {
+    candidatearray.clear();
+    super.initState();
+  }
 
 
   @override
@@ -58,32 +63,24 @@ var candidatearray = [] ;
             }, icon: const Icon(Icons.refresh))
           ],
         ),
-        body: SingleChildScrollView(
+        body: SingleChildScrollView(  //Here we are getting the whole candidate details
           child: Column(
             children: [
               Container(margin: const EdgeInsets.only(bottom: 56),
-                child: SingleChildScrollView(
-                  child: StreamBuilder<List>(stream: getCandidatesNum(
-                      widget.ethClient, widget.electionAdress).asStream(),
+                child: SingleChildScrollView(  // this stream builder will give the number of items/candidates
+                  child: StreamBuilder<List>(stream: getCandidatesNum(widget.ethClient, widget.electionAdress).asStream(),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(),);//circular bar for waiting
                       } else {
                         return Column(
-                          children: [
+                          children: [  // here we will get all candidates using a loop
                             for (int i = 0; i < snapshot.data![0].toInt(); i++)
-                              FutureBuilder<List>(
-                                  future: candidateInfo(i, widget.ethClient,
-                                      widget.electionAdress),
+                              FutureBuilder<List>(  // call to get candidate info
+                                  future: candidateInfo(i, widget.ethClient, widget.electionAdress),
                                   builder: (context, candidatesnapshot) {
-                                    if (candidatesnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                    if (candidatesnapshot.connectionState == ConnectionState.waiting) {
+                                      return const Center(child: CircularProgressIndicator(),);
                                     } else {
                                       //creating list
                                       List array = List.generate(row, (i) => List.filled(col, null, growable: true), growable: true);
@@ -96,6 +93,7 @@ var candidatearray = [] ;
                                       }else if(candidatesnapshot.data![0][1].toInt() == winnervotes){
                                         winner = candidatesnapshot.data![0][0];
                                       }
+                                      candidatearray.add(candidatesnapshot.data);
                                       print(candidatesnapshot.data);
                                       return Container(
                                         padding: const EdgeInsets.all(12),
@@ -136,7 +134,24 @@ var candidatearray = [] ;
               ),
               const SizedBox(height: 12,),
               Text('The winner of the election is : $winner with votes $winnervotes',style: const TextStyle(color: Colors.white)),
-              const SizedBox(height: 16,)
+              const SizedBox(height: 16,),
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                child: ListView.builder(
+                    itemCount:candidatearray.length,
+                    itemBuilder: (context,index){
+                      for (var i = 0; i < candidatearray.length; i++) {
+                        candidatearray.sort((a, b) {
+                          return int.parse(a[i][0][1].toString()).compareTo(int.parse(b[0][1].toString()));
+                        });
+                      }
+                      return ListTile(
+                        title: Text('${candidatearray[index][0][0]}'),
+                        subtitle:Text('votes : ${candidatearray[index][0][1]}'),
+                      );
+                    }),
+              ),
             ],
           ),
         ),
