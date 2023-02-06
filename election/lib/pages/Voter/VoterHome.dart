@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:election/pages/Admin/closeElection.dart';
 import 'package:election/services/IntoLogin.dart';
 import 'package:election/pages/Voter/Vote.dart';
 import 'package:election/pages/Voter/VoteRegister.dart';
@@ -12,8 +13,8 @@ import 'package:web3dart/web3dart.dart';
 import '../../services/Auth.dart';
 import '../../services/snackbar.dart';
 import '../../utils/Constants.dart';
-import '../../services/Electioninfo.dart';
 import '../../services/VerifyEmail.dart';
+import 'Votercard.dart';
 
 class VoterHome extends StatefulWidget {
   //getting required parameters to pass on to vote and authorize
@@ -92,7 +93,7 @@ class _VoterHomeState extends State<VoterHome> {
   @override
   Widget build(BuildContext context) {
 
-    Map<String,dynamic> voterdata = {'name':name,'adharnum':adhar.toString(),'email':email,};
+    Map<String,dynamic>? voterdata = {'name':name,'adharnum':adhar.toString(),'email':email,'phone':phone,'state':state,};
 
     if(user!.emailVerified){   //if the email is verified for the user
       return Container(
@@ -109,11 +110,15 @@ class _VoterHomeState extends State<VoterHome> {
             body: SingleChildScrollView(
               child: Column(
                 children: [
+                  //register to vote container
                   Container(
                     padding: const EdgeInsets.all(24),
                     margin: const EdgeInsets.only(bottom: 16),
                     child: InkWell(
                       onTap: () {
+                        if (kDebugMode) {
+                          print(widget.electiondata);
+                        }
                         String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
                         if(widget.electiondata![0] == false){
                           if(int.parse(widget.electiondata![1])<int.parse(now)&& int.parse(widget.electiondata![2])>int.parse(now)){
@@ -145,6 +150,49 @@ class _VoterHomeState extends State<VoterHome> {
                       ),
                     ),
                   ),
+
+                  //votercard container
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {
+                        if (kDebugMode) {
+                          print(widget.electiondata);
+                        }
+                        String now = DateTime.now().millisecondsSinceEpoch.toString().substring(0,10);
+                        if(widget.electiondata![0] == false){
+                          if(int.parse(widget.electiondata![1])<int.parse(now)&& int.parse(widget.electiondata![2])>int.parse(now)){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Votercard(electionName:widget.electionName!,
+                                      ethClient: widget.ethClient!, electionaddress:widget.electionaddress!,
+                                    votermap: voterdata,)));
+                          }else{snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
+                        }else{snackbarshow().showSnackBar(snackbarshow().endedelection, context);}
+                      },
+                      child: Card(borderOnForeground: true,elevation: 4,
+                        child: Column(
+                          children: [
+                            Container(height: 200,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: const DecorationImage(
+                                        image: AssetImage('assets/undraw/appreciation.png')))),
+                            Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
+                              child: const Center(
+                                child: Text('Votercard ',style: TextStyle(
+                                    fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  //votee container
                   Container(
                     padding: const EdgeInsets.all(24),
                     margin: const EdgeInsets.only(bottom: 16),
@@ -168,7 +216,7 @@ class _VoterHomeState extends State<VoterHome> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15),
                                     image: const DecorationImage(
-                                        image: AssetImage('assets/undraw/upvote.png')))),
+                                        image: AssetImage('assets/undraw/noted.png')))),
                             Container(decoration: const BoxDecoration(color: Colors.purple),width: double.infinity,
                               child: const Center(
                                 child: Text('Vote',style: TextStyle(fontWeight: FontWeight.bold,fontSize:16,color: Colors.white),),
@@ -179,6 +227,8 @@ class _VoterHomeState extends State<VoterHome> {
                       ),
                     ),
                   ),
+
+                  //close election container
                   Container(
                     padding: const EdgeInsets.all(24),
                     margin: const EdgeInsets.only(bottom: 16),
@@ -187,8 +237,8 @@ class _VoterHomeState extends State<VoterHome> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ElectionInfo(ethClient:ethclient!,electionName:widget.electionName!,
-                                  electionAddress:widget.electionaddress!,)));
+                                builder: (context) => CloseElec(ethClient:ethclient!,electionName:widget.electionName!,
+                                  electionAdress: widget.electionaddress!,)));
                       },
                       child: Card(borderOnForeground: true,elevation: 4,
                         child: Column(

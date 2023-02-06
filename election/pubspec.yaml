@@ -32,13 +32,15 @@ dependencies:
   web3dart:
   http:
   animated_splash_screen:
+  get: ^4.6.5
+  get_storage: ^2.0.3
   firebase_core:
   firebase_auth:
   cloud_firestore:
-  shared_preferences: ^2.0.15
   list_picker: ^1.0.0
   file_picker: ^5.2.4
   firebase_storage: ^11.0.10
+  syncfusion_flutter_charts: ^20.4.43
   simple_animations: ^5.0.0+3
 
 dev_dependencies:

@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:election/pages/Admin/AdminHome.dart';
 import 'package:election/services/Pickelection.dart';
+import 'package:election/services/snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import 'Auth.dart';
 import '../pages/Admin/Loginpage.dart';
@@ -27,8 +30,12 @@ class _IntroLoginState extends State<IntroLogin> with SingleTickerProviderStateM
 
   Future<void>getUserDetail() async {    //CHECKING IF IT IS ADMIIN OR NOT
     try {
-      print("is admin is :::::${isAdmin}");
-      print("current  user email is:::: ${currentuser?.email}");
+      if (kDebugMode) {
+        print("is admin is :::::${isAdmin}");
+      }
+      if (kDebugMode) {
+        print("current  user email is:::: ${currentuser?.email}");
+      }
       final DocumentSnapshot user = await FirebaseFirestore.instance
           .collection('Admins')
           .doc(currentuser?.email)
@@ -50,12 +57,10 @@ class _IntroLoginState extends State<IntroLogin> with SingleTickerProviderStateM
 
   @override
   void initState() {
-    getUserDetail();
+    if(FirebaseAuth.instance.currentUser?.uid != null){
+      getUserDetail();
+    }
     super.initState();
-    // _controller = AnimationController(vsync:this,duration: const Duration(milliseconds: 1500));
-    // _animation = Tween(begin: const Offset(0.0,8.0),end:const Offset(0.0,5.0))
-    //     .animate(CurvedAnimation(parent: _controller, curve:Curves.easeIn));
-    // _controller.forward();
   }
 
   @override
@@ -105,7 +110,7 @@ class _IntroLoginState extends State<IntroLogin> with SingleTickerProviderStateM
                       height: 56,
                       margin: const EdgeInsets.only(top: 0),
                       child: ElevatedButton(
-                        style:ElevatedButton.styleFrom(primary: Colors.white),
+                        style:ElevatedButton.styleFrom(backgroundColor: Colors.white),
                           onPressed: () {
                             if(FirebaseAuth.instance.currentUser?.uid == null){
                               Navigator.push(context,MaterialPageRoute(builder:(context)=>Login()));

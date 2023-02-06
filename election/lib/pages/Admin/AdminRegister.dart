@@ -7,8 +7,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:election/services/Auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import '../../services/snackbar.dart';
+import '../../utils/Constants.dart';
 
 class AdminRegister extends StatefulWidget {
   const AdminRegister({Key? key}) : super(key: key);
@@ -38,6 +41,8 @@ class _AdminRegisterState extends State<AdminRegister> {
   final TextEditingController _controllerrepassword = TextEditingController();
   final TextEditingController _controllerAdminKey = TextEditingController();
 
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
 //create user metheod using firebase auth
   Future<void> createUserWithEmailAndPassword() async {
     try {
@@ -63,7 +68,7 @@ class _AdminRegisterState extends State<AdminRegister> {
     try{
       await Admins.doc(Email).set({
         "Name":Name,"email":Email,"password":Password,"phone":Phone,"Admin":_istrue});
-      print('user added successfullyyyyyyy');
+      box.write('name',Name);
     }catch(err){
       if (kDebugMode) {
         print(err);
@@ -78,10 +83,6 @@ class _AdminRegisterState extends State<AdminRegister> {
     if(mounted){
       setState(() { _isloading = false; });
     }
-  }
-
-  Widget _errorMessage() {
-    return Text(errormessage == '' ? '' : 'Humm $errormessage');
   }
 
   @override
@@ -121,98 +122,29 @@ class _AdminRegisterState extends State<AdminRegister> {
             color: Colors.transparent,
             child: Center(
               child: SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(8),
+                child: Form(
+                  key: _formkey,
                   child: Column(
                     children: [
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerName,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'Name',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controlleremail,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'email id',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerphone,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'phone number as in adhar',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerpassword,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'password',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerrepassword,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'Re enter password',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      UserTextInput(controller: _controllerName,hinttext: 'Name as in adhar *'),
+                      UserTextInput(controller: _controlleremail,hinttext: 'Email of user *'),
+                      UserTextInput(controller: _controllerphone,hinttext: 'Phone number as in adhar *'),
+                      UserTextInput(controller: _controllerpassword,hinttext: 'Password (8- characters) *'),
+                      UserTextInput(controller: _controllerrepassword,hinttext: ' confirm your password*'),
                       ElevatedButton(
                         onPressed: () async {
-                          if (_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty) {
-                            if(_controllerName.text.isNotEmpty&&_controllerphone.text.isNotEmpty){
-                              if(_controllerpassword.text.length>7&&_controllerpassword.text==_controllerrepassword.text){
-                                await addAndCreateUser();
-                              }
-                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                          final FormState? form = _formkey.currentState;
+                          if(form != null){
+                            if(form.validate()){
+                              await addAndCreateUser();
+                            }else{
+                              snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
                             }
-                            snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                          }else{
+                            snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
                           }
-                          snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
                         },
-                        style: ElevatedButton.styleFrom(primary: Colors.white),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                         child: const Text(
                           'Register as Admin',
                           style: TextStyle(color: Colors.purple),
@@ -228,5 +160,50 @@ class _AdminRegisterState extends State<AdminRegister> {
       );
 
     }
+  }
+}
+
+
+class UserTextInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String? hinttext;
+  final bool? obscuretext;
+  const UserTextInput({
+    Key? key, required this.controller, this.hinttext, this.obscuretext,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom:16),
+      padding: const EdgeInsets.all(8),
+      child: TextFormField(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          obscureText: obscuretext!=null?true:false,
+          controller: controller,
+          validator: (value){
+            if(value == null||value.isEmpty){
+              return 'please enter the details';
+            }
+            return null;
+          },
+          decoration:  InputDecoration(
+            hintStyle: const TextStyle(color:Colors.white),
+            hintText: hinttext,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: const BorderSide(
+                color: Colors.purpleAccent,
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              borderSide: const BorderSide(
+                color: Colors.white,
+              ),
+            ),
+          )),
+    );
   }
 }

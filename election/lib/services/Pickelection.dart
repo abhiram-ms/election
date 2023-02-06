@@ -6,6 +6,7 @@ import 'package:election/services/snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart';
 
@@ -101,7 +102,7 @@ class _PickelecState extends State<Pickelec> {
                                       future: getDeployedElection(i, ethclient!, contractAdressConst),
                                       builder: (context, electionsnapshot) {
                                         if (electionsnapshot.connectionState == ConnectionState.waiting) {
-                                          return const Center(child: CircularProgressIndicator(),);
+                                          return const Center(child: Text('Fetching election data...'),);
                                         } else {
                                           if (kDebugMode) {
                                             print('${electionsnapshot.data}');
@@ -198,8 +199,11 @@ class _PickelecState extends State<Pickelec> {
                           .asStream(),
                       builder: (context, snapshot) {
                         try {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                          if(snapshot.data![0].toInt() == null){
+                            return const Center(
+                              child: Text('there is no data for now'),
+                            );
+                          }else if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
@@ -214,8 +218,7 @@ class _PickelecState extends State<Pickelec> {
                                 i < snapshot.data![0].toInt();
                                 i++)
                                   FutureBuilder<List>(
-                                      future: getDeployedElection(
-                                          i, ethclient!, contractAdressConst),
+                                      future: getDeployedElection(i, ethclient!, contractAdressConst),
                                       builder: (context, electionsnapshot) {
                                         if (electionsnapshot
                                             .connectionState ==
@@ -253,7 +256,11 @@ class _PickelecState extends State<Pickelec> {
                                               tileColor: Colors.transparent,
                                               onTap: ()async {
                                                  await checkElecStatus(electionsnapshot.data![0][0]);
-                                                 goVoterHome(electionsnapshot.data![0][0],electionsnapshot.data![0][1].toString());
+                                                 if(_electiondata[0] != null){
+                                                   goVoterHome(electionsnapshot.data![0][0],electionsnapshot.data![0][1].toString());
+                                                 }else{
+                                                   print('no election data');
+                                                 }
                                               },
                                               title: Text('${electionsnapshot.data![0][0]} ',
                                                 style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),

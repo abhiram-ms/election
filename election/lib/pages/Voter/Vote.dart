@@ -66,6 +66,7 @@ class _VoterVoteState extends State<VoterVote> {
   }//function to check ends
 
   TextEditingController privatekeyController = TextEditingController();
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -125,7 +126,13 @@ class _VoterVoteState extends State<VoterVote> {
                   ),
                   const SizedBox(height: 24,),
                   Container(padding: const EdgeInsets.all(16),
-                    child: TextField(
+                    child: TextFormField(
+                        validator: (value){
+                          if(value == null||value.isEmpty){
+                            return 'please enter the details';
+                          }
+                          return null;
+                        },
                         controller: privatekeyController,
                         decoration:
                         const InputDecoration(
@@ -274,7 +281,7 @@ class _VoterVoteState extends State<VoterVote> {
   }
   void gotoDashboard(){
     Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>VoterHome(ethClient: widget.ethClient,
-        electionName: widget.electionName, electionaddress: widget.electionaddress, electiondata: [],)), (route) => false);
+        electionName: widget.electionName, electionaddress: widget.electionaddress, electiondata:widget.electiondata!,)), (route) => false);
   }
    votebigFunction(int i)async{
     await vote(i,widget.ethClient!,privatekeyController.text,widget.electionaddress!);

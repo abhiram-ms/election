@@ -447,6 +447,7 @@ class _AdminHomeState extends State<AdminHome> {
         "enddate": timestampEnd,
         "name": electionNameTextController.text.toString(),
         "state": 'kerala',
+        "endedElection":false,
       });
       print('user added successfullyyyyyyy');
     } catch (err) {
@@ -485,14 +486,8 @@ class _AdminHomeState extends State<AdminHome> {
 
             showSnackBar(errorAdharSnack);
           }
-          if (kDebugMode) {
-            print('there is a problemmm');
-          }
-        }
-        showSnackBar(errorSnack);
-      }
-      showSnackBar(errorSnack);
-    }
-    showSnackBar(errorSnack);
+        }else{showSnackBar(errorSnack);}
+      }else{showSnackBar(errorSnack);}
+    }else{showSnackBar(errorSnack);}
   }
 }
