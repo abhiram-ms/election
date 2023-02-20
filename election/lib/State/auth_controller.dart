@@ -47,7 +47,7 @@ class AuthController extends GetxController{
           "Name":userData['Name'],"e-mail":userData['e-mail'],"adhar":userData['adhar'],
           "phone":userData['phone'],"Admin":userData['Admin'],
         });
-        Userbox.write('userdata',userData);
+        elecbox.write('userdata',userData);
       }catch(err){
         if (kDebugMode) {
           print('add user error ::: $err');
@@ -59,7 +59,7 @@ class AuthController extends GetxController{
           "Name":userData['Name'],"e-mail":userData['e-mail'],"adhar":userData['adhar'],
           "phone":userData['phone'],"Admin":userData['Admin'],
         });
-        Userbox.write('userdata',userData);
+        elecbox.write('userdata',userData);
       }catch(err){
         if (kDebugMode) {
           print('add user error ::: $err');
@@ -75,8 +75,8 @@ class AuthController extends GetxController{
     try {
       loadingbar();
       await Auth().signInwithEmailAndPassword(email: email, password:password);
-      if(Userbox.read('userdata') != null){
-        Userbox.remove('userdata');
+      if(elecbox.read('userdata') != null){
+        elecbox.remove('userdata');
       }
       if(Auth().currentuser == null){
         Get.snackbar('Not Authenticated','Either password or email is wrong' );

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../State/Controllers.dart';
-import '../State/auth_controller.dart';
 import '../pages/Admin/Loginpage.dart';
 import '../pages/Voter/VoterLogin.dart';
 

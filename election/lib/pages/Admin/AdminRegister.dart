@@ -113,7 +113,7 @@ class AdminRegister extends StatelessWidget {
     try{
       await authController.addUser(userdata,true);
       await authController.createUserWithEmailAndPassword(userdata,true);
-      Userbox.write('userdata',userdata);
+      elecbox.write('userdata',userdata);
     }catch(e){
       if (kDebugMode) {
         print('to map error ::: $e');
@@ -121,10 +121,10 @@ class AdminRegister extends StatelessWidget {
     }
 
     if (kDebugMode) {
-      var userinfo =  Userbox.read('userdata');
+      var userinfo =  elecbox.read('userdata');
       print(userinfo['e-mail']);
-      print('this is data stored :::: ${Userbox.read('userlogindata')}');
-      print('this is user data ::::${Userbox.read('userdata')}');
+      print('this is data stored :::: ${elecbox.read('userlogindata')}');
+      print('this is user data ::::${elecbox.read('userdata')}');
     }
   }
 

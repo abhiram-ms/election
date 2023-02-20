@@ -17,12 +17,12 @@ class DataController extends GetxController {
      currentuser = Auth().currentuser;//firebase auth current user initialization
      isAdmin = false;
      if (kDebugMode) {
-       print('this is isadmin');
+       print('this is isadmin $isAdmin');
      }
     //on intro login initialization
     if(FirebaseAuth.instance.currentUser?.uid  != null){
-      if(Userbox.read('userdata') != null ){
-        isAdmin = Userbox.read('userdata')['Admin'];
+      if(elecbox.read('userdata') != null ){
+        isAdmin = elecbox.read('userdata')['Admin'];
         if (kDebugMode) {
           print('this is isadmin $isAdmin');
         }
