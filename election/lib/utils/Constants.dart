@@ -15,4 +15,4 @@ String voter_adress3 = "0x6435Fdf5B2888A81C08c6dF5e4AF3F2580744e0F";
 String contractAdressConst = "0x1Bf20B02092484515b5615dF6dB4033E01DA0EB1";
 String contractAdressElection = "";
 
-final box = GetStorage();
+final Userbox = GetStorage();

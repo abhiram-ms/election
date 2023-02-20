@@ -1,72 +1,32 @@
-import 'package:election/pages/Admin/AdminHome.dart';
+import 'package:election/State/auth_controller.dart';
 import 'package:election/services/Auth.dart';
-import 'package:election/services/snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:election/pages/Admin/AdminRegister.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-import '../../services/Pickelection.dart';
 
 final User? user = Auth().currentuser;
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
-
-  @override
-  State<Login> createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-  String? errormessage = '';
-  bool _isloading = false;
+class Login extends StatelessWidget {
+   Login({Key? key}) : super(key: key);
 
   final TextEditingController _controlleremail = TextEditingController();
   final TextEditingController _controllerpassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
-    setState(() {
-      _isloading = true;
-    });
+  Future<void> signInWithEmailAndPassword(AuthController authController) async {
     try {
-      //try
-      //await and call metheod
-      await Auth().signInwithEmailAndPassword(
-          email: _controlleremail.text, password: _controllerpassword.text);
-      if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => Pickelec(admin: true,)),
-          (route) => false);
-    } on FirebaseAuthException catch (e) {
-      //catch
-      setState(() {
-        errormessage = e.message; //stores error message to errormessage
-      });
-    }
-    if (mounted) {
-      setState(() {
-        _isloading = false;
-      });
+      String email = _controlleremail.text.toString();
+      String password = _controllerpassword.text.toString();
+      authController.signInWithEmailAndPassword(email, password,true);
+    }catch (e) {
+      Get.snackbar('','error occurred : $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isloading) {
-      return  Container(
-        decoration:  const BoxDecoration(gradient:
-        LinearGradient(colors: [
-          Color(0xFF516395),
-          Color(0xFF614385 ),
-        ])),
-        child: const Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      );
-    } else {
+    AuthController authController = Get.put(AuthController());
       return Container(
         decoration:  const BoxDecoration(gradient:
         LinearGradient(colors: [
@@ -84,82 +44,98 @@ class _LoginState extends State<Login> {
                   color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
             ),
           ),
-          body: Container(
-            margin: const EdgeInsets.all(16),
-            color: Colors.transparent,
-            child: Center(
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controlleremail,
-                            decoration: const InputDecoration(
-                              hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'Emial',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        child: TextField(
+          body: Stack(
+            children: [
+              Container(
+                margin: const EdgeInsets.all(16),
+                color: Colors.transparent,
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            child: TextField(
+                                controller: _controlleremail,
+                                decoration: const InputDecoration(
+                                  hintStyle: TextStyle(color: Colors.white),
+                                    hintText: 'Email',
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(8))))),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            child: TextField(
 
-                            controller: _controllerpassword,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'password',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_controllerpassword.text.isNotEmpty &&
-                              _controlleremail.text.isNotEmpty) {
-                            await signInWithEmailAndPassword();
-                          }
-                          snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
-                        },
-                        style: ElevatedButton.styleFrom(primary: Colors.white),
-                        child: const Text(
-                          'Login as Admin',
-                          style: TextStyle(color: Colors.purple),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 40),
-                        child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AdminRegister()));
+                                controller: _controllerpassword,
+                                decoration: const InputDecoration(
+                                    hintStyle: TextStyle(color: Colors.white),
+                                    hintText: 'password',
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(8))))),
+                          ),
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (_controllerpassword.text.isNotEmpty &&
+                                  _controlleremail.text.isNotEmpty) {
+                                await signInWithEmailAndPassword(authController);
+                              }else{
+                                Get.snackbar('Fill details', 'The details are not filled');
+                              }
                             },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                             child: const Text(
-                                'Not Registered ?? Click to Register',
-                                style: TextStyle(color: Colors.white))),
+                              'Login as Admin',
+                              style: TextStyle(color: Colors.purple),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 40),
+                            child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AdminRegister()));
+                                },
+                                child: const Text(
+                                    'Not Registered ?? Click to Register',
+                                    style: TextStyle(color: Colors.white))),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+              GetBuilder<AuthController>(builder: (_){
+                if (authController.isloading == true) {
+                  return Container(
+                    color: Colors.white.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(backgroundColor: Colors.redAccent,color: Colors.white,),
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
+            ],
           ),
         ),
       );
     }
-  }
 }

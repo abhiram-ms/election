@@ -1,107 +1,25 @@
-import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:election/pages/Admin/AdminHome.dart';
-import 'package:election/services/VerifyEmail.dart';
+import 'package:election/State/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:election/services/Auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
-import '../../services/snackbar.dart';
 import '../../utils/Constants.dart';
 
-class AdminRegister extends StatefulWidget {
-  const AdminRegister({Key? key}) : super(key: key);
-
-  @override
-  State<AdminRegister> createState() => _AdminRegisterState();
-}
-
-class _AdminRegisterState extends State<AdminRegister> {
-
-  String? errormessage = '';
-  String? errorAddUser = '';
-
-  late String Name;
-  late String Email;
-  late String Phone;
-  late String Password;
-  late String Admin_Key;
-
-  final bool _istrue = true;
-  bool _isloading = false;
+class AdminRegister extends StatelessWidget {
+    AdminRegister({Key? key}) : super(key: key);
 
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controlleremail = TextEditingController();
   final TextEditingController _controllerphone = TextEditingController();
   final TextEditingController _controllerpassword = TextEditingController();
   final TextEditingController _controllerrepassword = TextEditingController();
-  final TextEditingController _controllerAdminKey = TextEditingController();
-
+    final TextEditingController _controlleradhar = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-
-//create user metheod using firebase auth
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      await Auth().createUserwithEmailAndPassword(email: _controlleremail.text, password: _controllerpassword.text);
-      if(mounted){
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  VerifyEmail()),(route) => false);
-      }else{return;}
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errormessage = e.message;
-      });
-    }
-  }
-
-  //cloud firestore using firestore
-  final CollectionReference Admins = FirebaseFirestore.instance.collection('Admins');
-
-  Future<void>addUser()async{
-    Name = _controllerName.text;
-    Email=_controlleremail.text;
-    Password=_controllerpassword.text;
-    Phone=_controllerphone.text;
-    try{
-      await Admins.doc(Email).set({
-        "Name":Name,"email":Email,"password":Password,"phone":Phone,"Admin":_istrue});
-      box.write('name',Name);
-    }catch(err){
-      if (kDebugMode) {
-        print(err);
-      }
-    }
-  }
-
-  Future<void>addAndCreateUser()async{
-    setState(() { _isloading = true; });
-    await createUserWithEmailAndPassword();
-    await addUser();
-    if(mounted){
-      setState(() { _isloading = false; });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    if(_isloading){
-      return Container(
-        decoration:  const BoxDecoration(gradient:
-        LinearGradient(colors: [
-          Color(0xFF516395),
-          Color(0xFF614385 ),
-        ])),
-        child: const Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      );
-    }else{
+    AuthController authController = Get.put(AuthController());
       return Container(
         decoration:  const BoxDecoration(gradient:
         LinearGradient(colors: [
@@ -117,59 +35,109 @@ class _AdminRegisterState extends State<AdminRegister> {
                   color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
             ),
           ),
-          body: Container(
-            margin: const EdgeInsets.all(16),
-            color: Colors.transparent,
-            child: Center(
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formkey,
-                  child: Column(
-                    children: [
-                      UserTextInput(controller: _controllerName,hinttext: 'Name as in adhar *'),
-                      UserTextInput(controller: _controlleremail,hinttext: 'Email of user *'),
-                      UserTextInput(controller: _controllerphone,hinttext: 'Phone number as in adhar *'),
-                      UserTextInput(controller: _controllerpassword,hinttext: 'Password (8- characters) *'),
-                      UserTextInput(controller: _controllerrepassword,hinttext: ' confirm your password*'),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final FormState? form = _formkey.currentState;
-                          if(form != null){
-                            if(form.validate()){
-                              await addAndCreateUser();
-                            }else{
-                              snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
-                            }
-                          }else{
-                            snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                        child: const Text(
-                          'Register as Admin',
-                          style: TextStyle(color: Colors.purple),
-                        ),
-                      )
-                    ],
+          body: Stack(
+            children: [
+              Container(
+                margin: const EdgeInsets.all(16),
+                color: Colors.transparent,
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formkey,
+                      child: Column(
+                        children: [
+                          UserTextInput(controller: _controllerName,hinttext: 'Name as in adhar *'),
+                          UserTextInput(controller: _controlleremail,hinttext: 'Email of user *'),
+                          UserTextInput(controller: _controllerphone,hinttext: 'Phone number as in adhar *',numberkeyboard: true,),
+                          UserTextInput(controller: _controlleradhar,hinttext: 'Adhar Number*',numberkeyboard: true,),
+                          UserTextInput(controller: _controllerpassword,hinttext: 'Password (8- characters) *',obscuretext: true,),
+                          UserTextInput(controller: _controllerrepassword,hinttext: ' confirm your password*',obscuretext: true,),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final FormState? form = _formkey.currentState;
+                              if(form != null){
+                                if(form.validate()){
+                                  await addAndCreateUser(authController);
+                                }else{
+                                  Get.snackbar('fill details', 'fill all details first');
+                                }
+                              }else{
+                                Get.snackbar('fill details', 'fill all details first');
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                            child: const Text(
+                              'Register as Admin',
+                              style: TextStyle(color: Colors.purple),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              GetBuilder<AuthController>(builder: (_){
+                if (authController.isloading == true) {
+                  return Container(
+                    color: Colors.white.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(backgroundColor: Colors.redAccent,color: Colors.white,),
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
+            ],
           ),
         ),
       );
+    }
 
+
+  //cloud firestore using firestore
+  Future<void>addAndCreateUser(AuthController authController)async{
+
+    String name = _controllerName.text;
+    String email=_controlleremail.text;
+    String password=_controllerpassword.text;
+    String phone=_controllerphone.text;
+    String adhar = _controlleradhar.text;
+    bool isTrue = true;
+
+    Map<String,dynamic> userdata = {
+      "Name":name,"e-mail":email,"password":password,"phone":phone,"Admin":isTrue,"adhar":adhar,
+    };
+
+    try{
+      await authController.addUser(userdata,true);
+      await authController.createUserWithEmailAndPassword(userdata,true);
+      Userbox.write('userdata',userdata);
+    }catch(e){
+      if (kDebugMode) {
+        print('to map error ::: $e');
+      }
+    }
+
+    if (kDebugMode) {
+      var userinfo =  Userbox.read('userdata');
+      print(userinfo['e-mail']);
+      print('this is data stored :::: ${Userbox.read('userlogindata')}');
+      print('this is user data ::::${Userbox.read('userdata')}');
     }
   }
-}
 
+
+}
 
 class UserTextInput extends StatelessWidget {
   final TextEditingController controller;
   final String? hinttext;
   final bool? obscuretext;
+  final bool? numberkeyboard;
   const UserTextInput({
-    Key? key, required this.controller, this.hinttext, this.obscuretext,
+    Key? key, required this.controller, this.hinttext, this.obscuretext, this.numberkeyboard,
   }) : super(key: key);
 
   @override
@@ -178,6 +146,7 @@ class UserTextInput extends StatelessWidget {
       margin: const EdgeInsets.only(bottom:16),
       padding: const EdgeInsets.all(8),
       child: TextFormField(
+          keyboardType:numberkeyboard==null? null:TextInputType.number,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           obscureText: obscuretext!=null?true:false,
           controller: controller,

@@ -1,8 +1,5 @@
-import 'package:election/pages/Admin/AdminHome.dart';
-import 'package:election/pages/Admin/Loginpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:election/services/IntoLogin.dart';
-import 'package:election/services/Auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 
@@ -28,7 +25,7 @@ class MyApp extends StatelessWidget {
         ])),
         child: AnimatedSplashScreen(
           backgroundColor:Colors.transparent,
-            nextScreen:IntroLogin(),
+            nextScreen:const IntroLogin(),
             splashIconSize: 200,
             splash: const Center(child:Icon(Icons.poll,size: 60,color: Colors.white,) ),
           ),

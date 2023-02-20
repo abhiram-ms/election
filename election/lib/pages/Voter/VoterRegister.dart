@@ -1,31 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:election/pages/Voter/VoterHome.dart';
-import 'package:election/services/Pickelection.dart';
-import 'package:election/services/snackbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import '../../State/auth_controller.dart';
+import '../../utils/Constants.dart';
+import '../Admin/AdminRegister.dart';
 
-import '../../services/Auth.dart';
-
-class VoterRegister extends StatefulWidget {
-  const VoterRegister({Key? key}) : super(key: key);
-
-  @override
-  State<VoterRegister> createState() => _VoterRegisterState();
-}
-
-class _VoterRegisterState extends State<VoterRegister> {
-  String? errormessage = '';
-  final bool _istrue = false;
-
-  late String Name;
-  late String Email;
-  late String Phone;
-  late String Password;
-  late String Voter_Key;
-  late String adhar;
-
-  bool _isloading = false;
+class VoterRegister extends StatelessWidget {
+   VoterRegister({Key? key}) : super(key: key);
 
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controlleremail = TextEditingController();
@@ -33,217 +14,117 @@ class _VoterRegisterState extends State<VoterRegister> {
   final TextEditingController _controllerpassword = TextEditingController();
   final TextEditingController _controllerrepassword = TextEditingController();
   final TextEditingController _controlleradhar = TextEditingController();
- // final TextEditingController _controllerVoterKey = TextEditingController();
-//create user metheod
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      await Auth().createUserwithEmailAndPassword(
-          email: _controlleremail.text, password: _controllerpassword.text);
-      if(!mounted)return;
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>Pickelec(admin: false)),(route) => false);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errormessage = e.message;
-        print('account not created'+"${errormessage}");
-      });
-    }
-  }
-
-  //firestore add user
-  //cloud firestore using firestore
-  final CollectionReference Voters = FirebaseFirestore.instance.collection('voters');
-
-  Future<void>addUser()async{
-    Name      =  _controllerName.text;
-    Email     =  _controlleremail.text;
-    Password  =  _controllerpassword.text;
-    Phone     =  _controllerphone.text;
-    adhar     =  _controlleradhar.text.toString();
-    try{
-      await Voters.doc(Email).set({
-        "name":Name,"email":Email,"password":Password,"phone":Phone,"Admin":_istrue,"adharnum":adhar,});
-      print("user added successfully");
-    }catch(err){
-      print("user not added");
-    }
-  }
-
-  Widget _errorMessage() {
-    return Text(errormessage == '' ? '' : 'Humm $errormessage');
-  }
-
-  Future<void>addAndCreateUser()async{
-    setState(() { _isloading = true; });
-    await createUserWithEmailAndPassword();
-    await addUser();
-    if(mounted){
-      setState(() { _isloading = false; });
-    }
-  }
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    if(_isloading){
-      return Container(
-        decoration:  const BoxDecoration(gradient:
-        LinearGradient(colors: [
-          Color(0xFF516395),
-          Color(0xFF614385 ),
-        ])),
-        child: const Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: CircularProgressIndicator(),
+    AuthController authController = Get.put(AuthController());
+    return Container(
+      decoration:  const BoxDecoration(gradient:
+      LinearGradient(colors: [
+        Color(0xFF516395),
+        Color(0xFF614385 ),
+      ])),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            "Register as Admin",
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
           ),
         ),
-      );
-    }else{
-      return Container(
-        decoration:  const BoxDecoration(gradient:
-        LinearGradient(colors: [
-          Color(0xFF516395),
-          Color(0xFF614385 ),
-        ])),
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              "Register Voter",
-              style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-          ),
-          body: Container(
-            margin: const EdgeInsets.all(16),
-            color: Colors.transparent,
-            child: Center(
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerName,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'Name',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controlleremail,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'email id',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controlleradhar,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'enter your adhar number',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerphone,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'phone number in your adhar',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerpassword,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'password',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _controllerrepassword,
-                            decoration: const InputDecoration(
-                                hintStyle: TextStyle(color: Colors.white),
-                                hintText: 'Re enter password',
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(8))))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_controllerpassword.text.isNotEmpty && _controlleremail.text.isNotEmpty) {
-                            if(_controllerName.text.isNotEmpty){
-                              if(_controllerphone.text.isNotEmpty&&_controllerpassword.text==_controllerrepassword.text){
-                                if(_controllerpassword.text.length>7){
-                                  await createUserWithEmailAndPassword().then((value) => () async {
-                                    await addUser();
-                                  });
-                                }
-                                snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+        body: Stack(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              color: Colors.transparent,
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formkey,
+                    child: Column(
+                      children: [
+                        UserTextInput(controller: _controllerName,hinttext: 'Name as in adhar *'),
+                        UserTextInput(controller: _controlleremail,hinttext: 'Email of user *'),
+                        UserTextInput(controller: _controllerphone,hinttext: 'Phone number as in adhar *',numberkeyboard: true,),
+                        UserTextInput(controller: _controlleradhar,hinttext: 'Adhar Number*',numberkeyboard: true,),
+                        UserTextInput(controller: _controllerpassword,hinttext: 'Password (8- characters) *',obscuretext: true,),
+                        UserTextInput(controller: _controllerrepassword,hinttext: ' confirm your password*',obscuretext: true,),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final FormState? form = _formkey.currentState;
+                            if(form != null){
+                              if(form.validate()){
+                                await addAndCreateUser(authController);
+                              }else{
+                                Get.snackbar('fill details', 'fill all details first');
                               }
-                              snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                            }else{
+                              Get.snackbar('fill details', 'fill all details first');
                             }
-                            snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
-                          }
-                          snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
-                        },
-                        style: ElevatedButton.styleFrom(primary: Colors.white),
-                        child: const Text(
-                          'Register as Voter',
-                          style: TextStyle(color: Colors.purple),
-                        ),
-                      )
-                    ],
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                          child: const Text(
+                            'Register as Admin',
+                            style: TextStyle(color: Colors.purple),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            GetBuilder<AuthController>(builder: (_){
+              if (authController.isloading == true) {
+                return Container(
+                  color: Colors.white.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(backgroundColor: Colors.redAccent,color: Colors.white,),
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
+          ],
         ),
-      );
+      ),
+    );
     }
-  }
+
+
+   //cloud firestore using firestore
+   Future<void>addAndCreateUser(AuthController authController)async{
+
+     String name = _controllerName.text;
+     String email=_controlleremail.text;
+     String password=_controllerpassword.text;
+     String phone=_controllerphone.text;
+     String adhar = _controlleradhar.text;
+     bool isTrue = false;
+
+     Map<String,dynamic> userdata = {
+       "Name":name,"e-mail":email,"password":password,"phone":phone,"Admin":isTrue,"adhar":adhar,
+     };
+
+     try{
+       await authController.addUser(userdata,false);
+       await authController.createUserWithEmailAndPassword(userdata,false);
+       Userbox.write('userdata',userdata);
+     }catch(e){
+       if (kDebugMode) {
+         print('to map error ::: $e');
+       }
+     }
+
+     if (kDebugMode) {
+       var userinfo =  Userbox.read('userdata');
+       print(userinfo['e-mail']);
+       print('this is data stored :::: ${Userbox.read('userlogindata')}');
+       print('this is user data ::::${Userbox.read('userdata')}');
+     }
+   }
+
 }

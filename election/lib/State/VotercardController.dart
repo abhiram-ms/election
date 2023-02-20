@@ -10,12 +10,6 @@ class VoterCardController extends GetxController{
 
   VoterCardController(this.electionName,this.votermap);
 
-  // Future<void>signOut()async{
-  //   await Auth().signOut();
-  //   if(!mounted)return;
-  //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>IntroLogin()), (route) => false);
-  // }
-
   //checking if the voter is already voted
   late bool isAuth = false;
   late bool isVoted = false;

@@ -1,41 +1,87 @@
-import 'package:election/Firebase/firebase_api.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:election/utils/Constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import '../services/Auth.dart';
 
-import '../Firebase/firebase_file.dart';
-import '../pages/Admin/closeElection.dart';
 
-class CloseElecController extends GetxController{
-  late Future<List<FirebaseFile>> futureFiles;
-  // void refresh() {
-  //   setState(() {
-  //   });
-  // }
-  // Future<void> signOut() async {
-  //   if (!mounted) return;
-  //   await Auth().signOut();
-  //   if (!mounted) return;
-  //   Navigator.pushAndRemoveUntil(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => IntroLogin()),
-  //           (route) => false);
-  // }
+class DataController extends GetxController {
 
-  late String winner = 'No candidate';
-  String? download;
-  late int winnervotes = 0;
-  late int row = 5;
-  late int col = 5;
-// var candidatearray = [] ;
-// var candidatearrayreal = [] ;
+  late bool isAdmin;
+  late User? currentuser;
+  bool isloading = false;
 
-  final Set<Candidates> _candidateset = {}; // your data goes here
-
-@override
+  @override
   void onInit() {
-  //futureFiles = FirebaseApi.listAll('electionimages/${}/partyimages/candidates');
-  _candidateset.clear();
+     currentuser = Auth().currentuser;//firebase auth current user initialization
+     isAdmin = false;
+     if (kDebugMode) {
+       print('this is isadmin');
+     }
+    //on intro login initialization
+    if(FirebaseAuth.instance.currentUser?.uid  != null){
+      if(Userbox.read('userdata') != null ){
+        isAdmin = Userbox.read('userdata')['Admin'];
+        if (kDebugMode) {
+          print('this is isadmin $isAdmin');
+        }
+        update();
+      }else{
+        getUserDetail();
+      }
+    }else{
+      if (kDebugMode) {
+        print('uid is null');
+      }
+    }
     super.onInit();
   }
 
+  //Intro Login Controller  ----------------------------------------------------------------------------------->
+
+  Future<void>getUserDetail() async {//CHECKING IF IT IS ADMIIN OR NOT
+    loadingbar();
+    try {
+      if (kDebugMode) {
+        print("is admin is :::::$isAdmin");
+      }
+      if (kDebugMode) {
+        print("current  user email is:::: ${currentuser?.email}");
+      }
+      final DocumentSnapshot user = await FirebaseFirestore.instance
+          .collection('Admins')
+          .doc(currentuser?.email)
+          .get();
+      if (user.data() != null) {
+        isAdmin = true;
+      }else{
+        isAdmin = false;
+      }
+      if (kDebugMode) {
+        print(" status of isadmin is::: $isAdmin");
+      }
+      Get.snackbar('success', 'success');
+    } catch (e) {
+      if (kDebugMode) {
+        print('get check user ::::: $e');
+        Get.snackbar('error occurred', '$e');
+      }
+    }
+    loadingbaroff();
+    update();
+  }//function to check ends
+
+//------------------------------------------------------------------------------------------------------------->
+
+  void loadingbar() {
+    isloading = true;
+    update();
+  }
+
+  void loadingbaroff() {
+    isloading = false;
+    update();
+  }
 
 }

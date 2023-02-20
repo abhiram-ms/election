@@ -1,4 +1,3 @@
-import 'package:election/utils/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
@@ -123,7 +122,9 @@ Future<List> getElectionCounts(Web3Client ethClient,String contractAdressOwner) 
 Future<String> createElection(String name, Web3Client ethClient, String adminprivatekey,String contractAdressOwner) async {
   var response =
   await callFunction('createElection', [name], ethClient, adminprivatekey,contractAdressOwner,true);    ////faaactoryyyyyyyyyyyyy
-  print('Election started successfully');
+  if (kDebugMode) {
+    print('Election started successfully');
+  }
   return response;
 }
 
@@ -131,7 +132,9 @@ Future<String> createElection(String name, Web3Client ethClient, String adminpri
 Future<String> closeElection( Web3Client ethClient, String adminprivatekey,String contractAdressOwner) async {
   var response =
   await callFunction('closeElection', [], ethClient, adminprivatekey,contractAdressOwner,true);    ////faaactoryyyyyyyyyyyyy
-  print('election ended successfully');
+  if (kDebugMode) {
+    print('election ended successfully');
+  }
   return response;
 }
 

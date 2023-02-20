@@ -1,22 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:election/pages/Admin/AddCandidate.dart';
-import 'package:election/pages/Admin/DashBoard.dart';
 import 'package:election/services/IntoLogin.dart';
 import 'package:election/services/snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import '../../services/Auth.dart';
 import '../../services/Pickelection.dart';
 import '../../services/functions.dart';
 import '../../utils/Constants.dart';
-import '../../services/Electioninfo.dart';
 import '../../services/VerifyEmail.dart';
 
 class AdminHome extends StatefulWidget {
@@ -91,18 +85,13 @@ class _AdminHomeState extends State<AdminHome> {
 
   SnackBar errorAdharSnack = const SnackBar(
       content: Text('Adhar verification failed make sure details are right'));
-  SnackBar succesAdharSnack =
-      const SnackBar(content: Text('Adhar verification successfull'));
+  SnackBar succesAdharSnack = const SnackBar(content: Text('Adhar verification successfull'));
   SnackBar errorSnack = const SnackBar(
       content: Text(' some error occuered try again Fill all the details'));
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
       SnackBar snackBar) {
     return ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
-  // final TextEditingController _electionNameController = TextEditingController();
-  // final TextEditingController _adharnumController = TextEditingController();
-  // final TextEditingController _NameController = TextEditingController();
 
   final User? user = Auth().currentuser;
   Future<void> signOut() async {
@@ -111,7 +100,7 @@ class _AdminHomeState extends State<AdminHome> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => IntroLogin()),
+        MaterialPageRoute(builder: (context) => const IntroLogin()),
         (route) => false);
   }
 
