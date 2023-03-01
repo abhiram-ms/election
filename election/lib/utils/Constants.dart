@@ -12,7 +12,7 @@ String gnacheurl = "HTTP://127.0.0.1:7545";
 String voter_adress = "0xc4d9eE2d363b465443D751F7D553919281D1bd0a";
 String voter_adress2 = "0x2f8434dA7347C7c5266eDcCf9C36D33aa7D59dD4";
 String voter_adress3 = "0x6435Fdf5B2888A81C08c6dF5e4AF3F2580744e0F";
-String contractAdressConst = "0x1Bf20B02092484515b5615dF6dB4033E01DA0EB1";
+String contractAdressConst = "0x841D7265aF2F5A4d4346d8A07aE5D91f1a440c4e";
 String contractAdressElection = "";
 
 final elecbox = GetStorage();

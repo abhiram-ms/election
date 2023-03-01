@@ -42,6 +42,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.purple,
       appBar: AppBar( ///app bar
         backgroundColor: Colors.cyan,
         leading: IconButton(
@@ -50,7 +51,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
           },
           icon: const Icon(Icons.logout_sharp),
         ),
-        title: const Text('Authorize Voter'),
+        title: const Text('Verification email sent'),
         actions: [
           IconButton(
               onPressed: () {

@@ -14,7 +14,7 @@ class AdminRegister extends StatelessWidget {
   final TextEditingController _controllerphone = TextEditingController();
   final TextEditingController _controllerpassword = TextEditingController();
   final TextEditingController _controllerrepassword = TextEditingController();
-    final TextEditingController _controlleradhar = TextEditingController();
+  final TextEditingController _controlleradhar = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   @override
@@ -121,10 +121,14 @@ class AdminRegister extends StatelessWidget {
     }
 
     if (kDebugMode) {
-      var userinfo =  elecbox.read('userdata');
-      print(userinfo['e-mail']);
-      print('this is data stored :::: ${elecbox.read('userlogindata')}');
-      print('this is user data ::::${elecbox.read('userdata')}');
+      try{
+        var userinfo =  elecbox.read('userdata');
+        print(userinfo['e-mail']);
+        print('this is data stored :::: ${elecbox.read('userlogindata')}');
+        print('this is user data ::::${elecbox.read('userdata')}');
+      }catch(e){
+        print('This is an errrorrr  ::: $e');
+      }
     }
   }
 

@@ -11,25 +11,37 @@ import '../utils/Constants.dart';
 class AuthController extends GetxController{
 
   bool isloading = false;
+  bool successAddUser = false;
 
+  @override
+  void onInit() {
+    isloading = false;
+    successAddUser =false;
+    super.onInit();
+  }
 
   //create user metheod using firebase auth
   Future<void> createUserWithEmailAndPassword(Map<String,dynamic> userData,bool admin) async {
     loadingbar();
     try {
-      await Auth().createUserwithEmailAndPassword(email:userData['e-mail']!, password:userData['password']!);
-      if(Auth().currentuser == null){
-        Get.snackbar('Not Authenticated','Failed to do the task' );
-      }else if(Auth().currentuser!.emailVerified){
-        Get.offAll(()=>  Pickelec(admin:admin));
+      if(successAddUser == true){
+        await Auth().createUserwithEmailAndPassword(email:userData['e-mail']!, password:userData['password']!);
+        if(Auth().currentuser == null){
+          Get.snackbar('Not Authenticated','Failed to do the task' );
+        }else if(Auth().currentuser!.emailVerified){
+          Get.offAll(()=>  Pickelec(admin:admin));
+        }else{
+          Get.offAll(()=>const VerifyEmail());
+        }
       }else{
-        Get.offAll(()=>const VerifyEmail());
+        Get.snackbar('Error signing in','try again after some time');
       }
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
         print('firebase auth exception ::: $e');
       }
       Get.snackbar('error occured', '$e');
+      loadingbaroff();
     }
     loadingbaroff();
   }
@@ -43,29 +55,41 @@ class AuthController extends GetxController{
     loadingbar();
     if(admin == true){ // check if adding data to admins or voters
       try{
+
         await admins.doc(userData['e-mail']).set({
           "Name":userData['Name'],"e-mail":userData['e-mail'],"adhar":userData['adhar'],
           "phone":userData['phone'],"Admin":userData['Admin'],
         });
         elecbox.write('userdata',userData);
+        successAddUser = true;
       }catch(err){
         if (kDebugMode) {
           print('add user error ::: $err');
         }
+        Get.snackbar('Error signing in','try again after some time');
+        loadingbaroff();
       }
+
     }else{
-      try{//add data to voters if admins is false
+      //add data to voters if admins is false
+      try{
+
         await voters.doc(userData['e-mail']).set({
           "Name":userData['Name'],"e-mail":userData['e-mail'],"adhar":userData['adhar'],
           "phone":userData['phone'],"Admin":userData['Admin'],
         });
         elecbox.write('userdata',userData);
+        successAddUser = true;
+
       }catch(err){
         if (kDebugMode) {
           print('add user error ::: $err');
+          Get.snackbar('Error signing in','try again after some time');
+          loadingbaroff();
         }
       }
     }
+    update();
     loadingbaroff();
   }
 

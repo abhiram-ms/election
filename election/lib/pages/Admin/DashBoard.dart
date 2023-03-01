@@ -3,7 +3,6 @@ import 'package:election/pages/Admin/AuthorizeVoter.dart';
 import 'package:election/pages/Admin/closeElection.dart';
 import 'package:election/services/Electioninfo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web3dart/web3dart.dart';
 

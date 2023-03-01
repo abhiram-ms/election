@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../services/Auth.dart';
@@ -143,81 +145,90 @@ class _VoterVoteState extends State<VoterVote> {
                   ),
                   const SizedBox(height: 24,),
                   SingleChildScrollView(
-                    child: StreamBuilder<List>(stream:getCandidatesNum(widget.ethClient!,widget.electionaddress!).asStream(),
+                    child: StreamBuilder<List>(stream: getCandidatesInfoList(
+                        widget.ethClient!, widget.electionaddress!).asStream(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return Column(
-                            children: [
-                              for (int i = 0; i < snapshot.data![0].toInt(); i++)
-                                FutureBuilder<List>(
-                                    future: candidateInfo(i, widget.ethClient!,widget.electionaddress!),
-                                    builder: (context, candidatesnapshot) {
-                                      if (candidatesnapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      } else {
-                                        return Container(
-                                          padding: const EdgeInsets.all(12),
-                                          margin: const EdgeInsets.all(12),
-                                          decoration: const BoxDecoration(
-                                              boxShadow: [
-                                                BoxShadow(color: Color(0xFF7F5A83),
-                                                  offset: Offset(-11.9, -11.9),
-                                                  blurRadius: 39,
-                                                  spreadRadius: 0.0,
-                                                ),
-                                                BoxShadow(color: Color(0xFF7F5A83),
-                                                  offset: Offset(11.9, 11.9),
-                                                  blurRadius: 39,
-                                                  spreadRadius: 0.0,
-                                                ),
-                                              ],
-                                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                                              gradient: LinearGradient(colors: [
-                                                Color(0xFF74F2CE),
-                                                Color(0xFF7CFFCB),
-                                              ])),
-                                          child: ListTile(
-                                            tileColor: Colors.transparent,
-                                            title: Text('${candidatesnapshot.data![0][0]}',
-                                              style: const TextStyle(color: Colors.purple,fontSize: 16),),
-                                            subtitle: const Text('party : mentioned above',
-                                              style: TextStyle(color: Colors.purple),),
-                                            leading: ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                minHeight: 90,
-                                                minWidth: 90,
-                                                maxHeight: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              child:const Image(image: AssetImage('assets/undraw/electionday.png')),
+                        if(snapshot.connectionState == ConnectionState.waiting){
+                          return const Center(child: CircularProgressIndicator());
+                        }else if(snapshot.hasError){
+                          Get.snackbar('Error ','cannot fetch data at the moment');
+                          return const Center(child: Text('Error : Cannot fetch data at the moment',style: TextStyle(color: Colors.white),));
+                        } else if(snapshot.hasData){
+                          if(snapshot.data!.isEmpty){
+                            return const Center(child: Text('There is no election at the moment',style: TextStyle(color: Colors.white),));
+                          }else{
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              child: ListView.builder(
+                                  itemCount: snapshot.data![0][0].length,
+                                  itemBuilder: (context,index){
+                                    if (kDebugMode) {
+                                      print('....1 ${snapshot.data![0]}');
+                                    }
+                                    if (kDebugMode) {
+                                      print('....2 ${snapshot.data![0][0]}');
+                                    }
+                                    if (kDebugMode) {
+                                      print('....3 ${snapshot.data![0][0][0]}');
+                                    }
+                                    return Container(
+                                      padding: const EdgeInsets.all(12),
+                                      margin: const EdgeInsets.all(12),
+                                      decoration: const BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(color: Color(0xFF7F5A83),
+                                              offset: Offset(-11.9, -11.9),
+                                              blurRadius: 39,
+                                              spreadRadius: 0.0,
                                             ),
-                                            trailing: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(primary: Colors.white),
-                                              onPressed: ()async {
-                                                try{
-                                                  await votebigFunction(i);
-                                                  showSnackBar(succesdetailsnackSnack);
-                                                }catch(e){
-                                                  if (kDebugMode) {
-                                                    print(e);
-                                                  }
-                                                  showSnackBar(errordetailsnackSnack);
-                                                  gotoDashboard();
-                                                }
-                                              }, child: const Text('Vote',style: TextStyle(color: Colors.purple),)),
+                                            BoxShadow(color: Color(0xFF7F5A83),
+                                              offset: Offset(11.9, 11.9),
+                                              blurRadius: 39,
+                                              spreadRadius: 0.0,
+                                            ),
+                                          ],
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          gradient: LinearGradient(colors: [
+                                            Color(0xFF74F2CE),
+                                            Color(0xFF7CFFCB),
+                                          ])),
+                                      child: ListTile(
+                                        tileColor: Colors.transparent,
+                                        title: Text('${snapshot.data![0][index][0]}',
+                                          style: const TextStyle(color: Colors.purple,fontSize: 16),),
+                                        subtitle: const Text('party : mentioned above',
+                                          style: TextStyle(color: Colors.purple),),
+                                        leading: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                            minHeight: 90,
+                                            minWidth: 90,
+                                            maxHeight: 100,
+                                            maxWidth: 100,
                                           ),
-                                        );
-                                      }
-                                    })
-                            ],
-                          );
+                                          child:const Image(image: AssetImage('assets/undraw/electionday.png')),
+                                        ),
+                                        trailing: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                                            onPressed: ()async {
+                                              try{
+                                                await votebigFunction(index);
+                                                showSnackBar(succesdetailsnackSnack);
+                                              }catch(e){
+                                                if (kDebugMode) {
+                                                  print(e);
+                                                }
+                                                showSnackBar(errordetailsnackSnack);
+                                                gotoDashboard();
+                                              }
+                                            }, child: const Text('Vote',style: TextStyle(color: Colors.purple),)),
+                                      ),
+                                    );
+                                  }),
+                            );
+                          }
+                        }else{
+                          Get.snackbar('Error ','cannot fetch data at the moment');
+                          return  const Center(child: Text('Cannot fetch data at the moment',style: TextStyle(color: Colors.white),));
                         }
                       },
                     ),

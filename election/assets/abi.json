@@ -3,22 +3,6 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "_elecname",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
         "name": "_candidateName",
         "type": "string"
       }
@@ -42,13 +26,56 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "closeElection",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_electionName",
+        "type": "string"
+      }
+    ],
+    "name": "startElection",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_elecname",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "index",
+        "name": "candidateIndex",
         "type": "uint256"
       }
     ],
+    "name": "vote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "candidateInfo",
     "outputs": [
       {
@@ -64,9 +91,9 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct Election.Candidate",
+        "internalType": "struct Election.Candidate[]",
         "name": "",
-        "type": "tuple"
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -94,13 +121,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "closeElection",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -144,12 +164,12 @@
   },
   {
     "inputs": [],
-    "name": "getNumCandidates",
+    "name": "getelectionName",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "",
-        "type": "uint256"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -170,19 +190,6 @@
   },
   {
     "inputs": [],
-    "name": "getelectionName",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -192,19 +199,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_electionName",
-        "type": "string"
-      }
-    ],
-    "name": "startElection",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -218,19 +212,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "candidateIndex",
-        "type": "uint256"
-      }
-    ],
-    "name": "vote",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

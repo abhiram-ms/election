@@ -1,17 +1,13 @@
 
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:election/State/homeController.dart';
 import 'package:election/pages/Admin/DashBoard.dart';
-import 'package:election/services/snackbar.dart';
 import 'package:election/utils/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:list_picker/list_picker.dart';
-import 'package:file_picker/file_picker.dart';
 
 import '../../services/Auth.dart';
 import '../../services/functions.dart';
@@ -29,7 +25,7 @@ class AddCandidate extends StatefulWidget {
 
 class _AddCandidateState extends State<AddCandidate> {
 
-  List<String> party = ['BJP','BSP','CPI','CPM','INC','NPC'];
+  List<String> party = ['BJP','BSP','CPI','CPM','INC','NPC','Individual',];
 
 //firebase auth instance initialization
   final User? user = Auth()
@@ -45,46 +41,6 @@ class _AddCandidateState extends State<AddCandidate> {
         MaterialPageRoute(builder: (context) => IntroLogin()),
             (route) => false);
   }
-
-  //variables declared
-  late int _adharage;
-  late int _adharnum;
-  late String name;
-  late String address;
-  late String mobile;
-  late String email;
-  late String district;
-  late String state;
-  late String dob;
-
-//get adhar verification function to get adhar details of the candidate
-  Future<void> getAdharVerified(String adharnum) async {
-    try {
-      final DocumentSnapshot adhars = await FirebaseFirestore.instance
-          .collection('Adhars')
-          .doc(adharnum)
-          .get();
-      if (adhars.data() != null) {
-
-        _adharage = adhars.get('age'); //assign adhars age to adharage
-        _adharnum = adhars.get('adharnum'); //store adharnum in this variablee
-        name = adhars.get('name');
-        address = adhars.get('address');
-        district = adhars.get('district');
-        state = adhars.get('state');
-        email = adhars.get('email');
-        mobile = adhars.get('mobileNum');
-        dob = adhars.get('dob');
-        if(!mounted)return;
-        snackbarshow().showSnackBar(snackbarshow().succesAdharSnack, context); //show snackbar
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('get adhar verified failed ::::: $e');
-      }
-      snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
-    }
-  }
   final formKey = GlobalKey<FormState>();
 
   TextEditingController candidateNameController = TextEditingController();
@@ -97,16 +53,10 @@ class _AddCandidateState extends State<AddCandidate> {
     setState(() {});
   }
 
-  late int numberOfCandidates;
-  late File? filetodisplay;
-  late bool isselected = false;
-  late bool isloading = false;
-  UploadTask? uploadTask;
-
 
   @override
   Widget build(BuildContext context) {
-    if(isloading == false){
+    HomeController homeController = Get.find();
       return Container(
         decoration:  const BoxDecoration(gradient:
         LinearGradient(colors: [
@@ -140,32 +90,11 @@ class _AddCandidateState extends State<AddCandidate> {
                               const SizedBox(height: 24,),
                               InkWell(
                                 onTap: () async {
-                                  FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                    type: FileType.image,
-                                    allowMultiple: false,
-                                  );
 
-                                  if (result != null) {
-                                    PlatformFile file = result.files.first;
-                                    filetodisplay = File(file.path.toString());
-                                    //String filename = file.name.toString();
-                                    isselected=true;
-                                    refresh();
-
-                                    if (kDebugMode) {
-                                      print(file.name);
-                                      print(file.bytes);
-                                      print(file.size);
-                                      print(file.extension);
-                                      print(file.path);
-                                    }
-                                  } else {
-                                    isselected=false;
-                                    // User canceled the picker
-                                  }
                                 },
                                 child: SizedBox(height:100 ,width: 100,
-                                  child: ClipRRect(borderRadius:BorderRadius.circular(100),child:Image(image:isselected?Image.file(filetodisplay!).image:
+                                  child: ClipRRect(borderRadius:BorderRadius.circular(100),
+                                    child:Image(image:homeController.isselected?Image.file(homeController.filetodisplay!).image:
                                   const AssetImage('assets/undraw/electionday.png'),fit:BoxFit.fill,),),
                                 ),
                               ),
@@ -233,29 +162,25 @@ class _AddCandidateState extends State<AddCandidate> {
                               const SizedBox(height: 4,),
                               ElevatedButton(
                                   onPressed: () async {
-                                    setState(() {isloading = true;});
-                                    if (formKey.currentState!.validate()&&filetodisplay!=null){
-                                      await getAdharVerified(candidateAdharController.text);
-                                      if (_adharage >= 18) {
-                                        try{
-                                          await uploadimageAndData().then((value) => {
-                                            addCandidate(candidateNameController.text, widget.ethClient,
-                                                adminmtmskController.text, widget.electionAdress),
-                                          });
-                                        }catch(e){
-                                          if(!mounted)return;
-                                          snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
+                                    if (formKey.currentState!.validate()&&homeController.filetodisplay!=null){
+                                      //try and catch for functions
+                                      try{
+
+                                        // getting adhar verified and adding candidate data
+                                        await homeController.getAdharVerifiedCandidate(candidateAdharController.text);
+                                        if (homeController.adharAge >= 18) {
+                                          toAddCandidate(homeController);
+                                          gotoHome();
+                                        } else {
+                                          Get.snackbar('Error', 'Adhar Verification failed :( ');
                                         }
-                                        gotoHome();
-                                      } else {
-                                        if(!mounted)return;
-                                        snackbarshow().showSnackBar(snackbarshow().errorAdharSnack, context);
+
+                                      }catch(e){
+                                        Get.snackbar('Error', 'Adhar Verification failed :( ');
                                       }
                                     } else {
-                                      if(!mounted)return;
-                                      snackbarshow().showSnackBar(snackbarshow().errorSnack, context);
+                                      Get.snackbar('Error', 'error occured :( ');
                                     }
-                                    setState(() {isloading = false;});
                                   },
                                   style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                                   child: const Text('Add Candidate',style: TextStyle(color: Colors.purple),))
@@ -266,63 +191,72 @@ class _AddCandidateState extends State<AddCandidate> {
                       const Divider(thickness: 2,color: Colors.purple,),
                       Container(margin: const EdgeInsets.only(bottom: 56,left:8,),
                         child: SingleChildScrollView(
-                          child: StreamBuilder<List>(stream: getCandidatesNum(
+                          child: StreamBuilder<List>(stream: getCandidatesInfoList(
                               widget.ethClient, widget.electionAdress).asStream(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else {
-                                return Column(
-                                  children: [
-                                    for (int i = 0; i < snapshot.data![0].toInt(); i++)
-                                      FutureBuilder<List>(
-                                          future: candidateInfo(i, widget.ethClient,
-                                              widget.electionAdress),
-                                          builder: (context, candidatesnapshot) {
-                                            if (candidatesnapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return const Center(
-                                                child: CircularProgressIndicator(),
-                                              );
-                                            } else {
-                                              if (kDebugMode) {
-                                                print(candidatesnapshot.data);
-                                              }
-                                              return Container(
-                                                padding: const EdgeInsets.all(12),
-                                                margin: const EdgeInsets.all(12),
-                                                decoration: const BoxDecoration(
-                                                    boxShadow: [
-                                                      BoxShadow(color: Color(0xFF7F5A83),
-                                                        offset: Offset(-11.9, -11.9),
-                                                        blurRadius: 39,
-                                                        spreadRadius: 0.0,
-                                                      ),
-                                                      BoxShadow(color: Color(0xFF7F5A83),
-                                                        offset: Offset(11.9, 11.9),
-                                                        blurRadius: 39,
-                                                        spreadRadius: 0.0,
-                                                      ),
-                                                    ],
-                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                    gradient: LinearGradient(colors: [
-                                                      Color(0xFF74F2CE),
-                                                      Color(0xFF7CFFCB),
-                                                    ])),
-                                                child: ListTile(
-                                                  title: Text('Name: ${candidatesnapshot.data![0][0]}',
-                                                    style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
-                                                  subtitle: Text('Votes: ${candidatesnapshot.data![0][1]}',
-                                                    style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
-                                                ),
-                                              );
-                                            }
-                                          })
-                                  ],
-                                );
+                              if(snapshot.connectionState == ConnectionState.waiting){
+                                return const Center(child: CircularProgressIndicator());
+                              }else if(snapshot.hasError){
+                                Get.snackbar('Error ','cannot fetch data at the moment');
+                                return const Center(child: Text('Error : Cannot fetch data at the moment',style: TextStyle(color: Colors.white),));
+                              } else if(snapshot.hasData){
+                                if(snapshot.data!.isEmpty){
+                                return const Center(child: Text('There is no election at the moment',style: TextStyle(color: Colors.white),));
+                              }else{
+                                  return SizedBox(
+                                    height: MediaQuery.of(context).size.height,
+                                    child: ListView.builder(
+                                        itemCount: snapshot.data![0][0].length,
+                                        itemBuilder: (context,index){
+                                          if (kDebugMode) {
+                                            print('....1 ${snapshot.data![0]}');
+                                          }
+                                          if (kDebugMode) {
+                                            print('....2 ${snapshot.data![0][0]}');
+                                          }
+                                          if (kDebugMode) {
+                                            print('....3 ${snapshot.data![0][0][0]}');
+                                          }
+                                          return Container(
+                                            padding: const EdgeInsets.all(12),
+                                            margin: const EdgeInsets.all(12),
+                                            decoration: const BoxDecoration(
+                                                boxShadow: [
+                                                  BoxShadow(color: Color(0xFF7F5A83),
+                                                    offset: Offset(-11.9, -11.9),
+                                                    blurRadius: 39,
+                                                    spreadRadius: 0.0,
+                                                  ),
+                                                  BoxShadow(color: Color(0xFF7F5A83),
+                                                    offset: Offset(11.9, 11.9),
+                                                    blurRadius: 39,
+                                                    spreadRadius: 0.0,
+                                                  ),
+                                                ],
+                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                gradient: LinearGradient(colors: [
+                                                  Color(0xFF74F2CE),
+                                                  Color(0xFF7CFFCB),
+                                                ])),
+                                            child: ListTile(
+                                              tileColor: Colors.transparent,
+                                              onTap: () {
+                                                // Get.offAll(()=>DashBoard(
+                                                //     ethClient:homeController.ethclient!,
+                                                //     electionName: snapshot.data![0][index][0],
+                                                //     electionaddress: snapshot.data![0][index][1].toString()));
+                                              },
+                                              title: Text('${snapshot.data![0][index][0]}', style: const TextStyle(fontSize:16,fontWeight:FontWeight.bold),),
+                                              subtitle: Text('candidate  $index'),
+                                              trailing: const Icon(Icons.poll_outlined),
+                                            ),
+                                          );
+                                        }),
+                                  );
+                                }
+                              }else{
+                                Get.snackbar('Error ','cannot fetch data at the moment');
+                                return  const Center(child: Text('Cannot fetch data at the moment',style: TextStyle(color: Colors.white),));
                               }
                             },
                           ),
@@ -331,83 +265,72 @@ class _AddCandidateState extends State<AddCandidate> {
                     ],
                   ),
                 ),
+                GetBuilder<HomeController>(builder: (_){
+                  if (homeController.isloading == true) {
+                    return Container(
+                      color: Colors.white.withOpacity(0.5),
+                      child: const Center(
+                        child: CircularProgressIndicator(backgroundColor: Colors.redAccent,color: Colors.white,),
+                      ),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }),
+                GetBuilder<HomeController>(builder: (_){
+                  if (homeController.isaAdharVerifying == true) {
+                    return Container(
+                      color: Colors.purpleAccent.withOpacity(0.5),
+                      child:  Center(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height/2,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Image.asset('assets/undraw/noted.png'),
+                                ),
+                                const Expanded(child: Text('verifying aadhaar',style: TextStyle(color: Colors.white),),),
+                                const CircularProgressIndicator(),
+                              ],
+                            ),
+                          )
+                      ),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }),
               ],
             )
         ),
       );
-    }else{
-      return Container(
-          decoration:  const BoxDecoration(gradient:
-          LinearGradient(colors: [
-          Color(0xFF516395),
-            Color(0xFF614385 ),])),
-        child: Scaffold(
-          appBar:AppBar(backgroundColor: Colors.transparent,elevation: 0,),
-          body: Center(
-            child: Column(mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                CircularProgressIndicator(),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
   }
-  Future<void> uploadimageAndData() async{
-    //file path and reference to storage
-    final String filepath = 'electionimages/${widget.electionName}/partyimages/candidates/${candidateNameController.text.toString()}/';
-    final storageref = FirebaseStorage.instance.ref().child(filepath);
-    //reference to add data to collection
-    final DocumentReference candidate = FirebaseFirestore.instance.collection('Election').doc(widget.electionName)
-        .collection('candidates').doc(candidateAdharController.text.toString());
-      try{
-        //uploading picture
-      uploadTask = storageref.putFile(filetodisplay!) ;
-      //final snapshot = await uploadTask?.whenComplete((){});
-      //uploading data
-      await candidate.set({
-        "Name":candidateNameController.text.toString(),"Age":_adharage,"adharnum":candidateAdharController.text.toString(),
-        "party":selectpartycontroller.text.toString(),"email":email,
-        "phonenum":mobile,"district":district,"state":state,"address":address,"dob":dob,
-      });
-      //clearing controllers
-      if (kDebugMode) {
-        print('succcessssssssssss');
-      }
-    }catch(e){
-        if (kDebugMode) {
-          print('whaat went wronggg :::: $e');
-        }
-      }
-  }
-
-  // Widget buildProgress() =>StreamBuilder<TaskSnapshot>(
-  //     stream: uploadTask?.snapshotEvents,
-  //     builder:(context , snapshot){
-  //       if(snapshot.hasData){
-  //         final data = snapshot.data;
-  //         double progress = data!.bytesTransferred/data.totalBytes;
-  //         return SizedBox(height: 50,
-  //           child: Stack(
-  //           fit: StackFit.expand,
-  //             children: [
-  //               LinearProgressIndicator(value: progress,backgroundColor: Colors.white,color: Colors.cyan,),
-  //               Center(
-  //                 child: Text('${(100 * progress).roundToDouble()}%',
-  //                   style:const TextStyle(color: Colors.grey) ,),
-  //               ),
-  //             ],
-  //         ),);
-  //       }else{
-  //         return const SizedBox(height: 50,);
-  //       }
-  //     }
-  // );
 
   void gotoHome(){
-    setState(() {isloading = false;});
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>
         DashBoard(ethClient:widget.ethClient, electionName:widget.electionName, electionaddress:widget.electionAdress)), (route) => false);
+  }
+
+  void toAddCandidate(HomeController homeController) {
+    Map<String,dynamic> candidateData = {
+      "Name":candidateNameController.text.toString(),"Age":homeController.adharAge,"adharnum":candidateAdharController.text.toString(),
+      "party":selectpartycontroller.text.toString(),"email":homeController.email,
+      "phonenum":homeController.mobile,"district":homeController.district,"state":homeController.state,
+      "address":homeController.address,"dob":homeController.dob,
+    };
+
+    try{
+      if (kDebugMode) {
+        print(candidateData);
+      }
+      homeController.addCandidateAndUpload(candidateData, widget.electionName, widget.electionAdress,adminmtmskController.text);
+    }catch(e){
+      Get.snackbar('error','failed to do the action');
+      if (kDebugMode) {
+        print("this is toAddCandidate error $e");
+      }
+    }
+
   }
 }

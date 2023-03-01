@@ -24,7 +24,7 @@ class VoterLogin extends StatelessWidget {
           centerTitle: true,
           automaticallyImplyLeading: false,
           title: const Text(
-            "Login Admin",
+            "Login Voter",
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
           ),

@@ -72,10 +72,16 @@ Future<String> authorizeVoter(String address, Web3Client ethClient,String adminp
   return response;
 }
 //get total number of candidates
-Future<List> getCandidatesNum(Web3Client ethClient,String contractAdressOwner) async {
-  List<dynamic> result = await ask('getNumCandidates', [], ethClient,contractAdressOwner,false);
+// Future<List> getCandidatesNum(Web3Client ethClient,String contractAdressOwner) async {
+//   List<dynamic> result = await ask('getNumCandidates', [], ethClient,contractAdressOwner,false);
+//   return result;
+// }
+//get candidate info list
+Future<List> getCandidatesInfoList(Web3Client ethClient,String contractAdressOwner) async {
+  List<dynamic> result = await ask('candidateInfo', [], ethClient,contractAdressOwner,false);
   return result;
 }
+
 // get election name
 Future<List> getelectionName(Web3Client ethClient,String contractAdressOwner) async {
   List<dynamic> result = await ask('getelectionName', [], ethClient,contractAdressOwner,false);
@@ -89,11 +95,11 @@ Future<List> getTotalVotes(Web3Client ethClient,String contractAdressOwner) asyn
 }
 
 //candidate info  of the candidate of index (adress of election not contracaddress)
-Future<List> candidateInfo(int index, Web3Client ethClient,String contractAdressOwner) async {
-  List<dynamic> result =
-  await ask('candidateInfo', [BigInt.from(index)], ethClient,contractAdressOwner,false);
-  return result;
-}
+// Future<List> candidateInfo(int index, Web3Client ethClient,String contractAdressOwner) async {
+//   List<dynamic> result =
+//   await ask('candidateInfo', [BigInt.from(index)], ethClient,contractAdressOwner,false);
+//   return result;
+// }
 
 //function to vote
 Future<String> vote(int candidateIndex, Web3Client ethClient,String voterprivatekey,String contractAdressOwner) async {
@@ -106,15 +112,24 @@ Future<String> vote(int candidateIndex, Web3Client ethClient,String voterprivate
 /////////////////////////////////////// FACTORY FUNCTIONS FOR ELECTION FACTORY ///////////////////////////////////////
 
 //candidate info  of the candidate of index
-Future<List> getDeployedElection(int index, Web3Client ethClient,String contractAdressOwner) async {    //factoryyyyyyyyyyyyyy
-  List<dynamic> result =
-  await ask('getDeployedElection', [BigInt.from(index)], ethClient,contractAdressOwner,true);
-  return result;
-}
+// Future<List> getDeployedElection(int index, Web3Client ethClient,String contractAdressOwner) async {    //factoryyyyyyyyyyyyyy
+//   List<dynamic> result =
+//   await ask('getDeployedElection', [BigInt.from(index)], ethClient,contractAdressOwner,true);
+//   return result;
+// }
 
 //election factory function to get total number of elections
-Future<List> getElectionCounts(Web3Client ethClient,String contractAdressOwner) async {             //factoryyyyyyyyyyyy
-  List<dynamic> result = await ask('getElectionCounts', [], ethClient,contractAdressOwner,true);
+// Future<List> getElectionCounts(Web3Client ethClient,String contractAdressOwner) async {             //factoryyyyyyyyyyyy
+//   List<dynamic> result = await ask('getElectionCounts', [], ethClient,contractAdressOwner,true);
+//   return result;
+// }
+
+//election factory function to get total number of elections
+Future<List> getElectionsList(Web3Client ethClient,String contractAdressOwner) async {             //factoryyyyyyyyyyyy
+  List<dynamic> result = await ask('getDeployedElection', [], ethClient,contractAdressOwner,true);
+  if (kDebugMode) {
+    print('this is result returned on electionsList ::: $result ');
+  }
   return result;
 }
 

@@ -19,14 +19,19 @@ class DataController extends GetxController {
      if (kDebugMode) {
        print('this is isadmin $isAdmin');
      }
+
+
     //on intro login initialization
     if(FirebaseAuth.instance.currentUser?.uid  != null){
+
       if(elecbox.read('userdata') != null ){
         isAdmin = elecbox.read('userdata')['Admin'];
+
         if (kDebugMode) {
           print('this is isadmin $isAdmin');
         }
         update();
+
       }else{
         getUserDetail();
       }
@@ -59,13 +64,13 @@ class DataController extends GetxController {
         isAdmin = false;
       }
       if (kDebugMode) {
-        print(" status of isadmin is::: $isAdmin");
+        print(" status of is admin is::: $isAdmin");
       }
-      Get.snackbar('success', 'success');
+     // Get.snackbar('success', 'success');
     } catch (e) {
       if (kDebugMode) {
         print('get check user ::::: $e');
-        Get.snackbar('error occurred', '$e');
+        //Get.snackbar('error occurred', '$e');
       }
     }
     loadingbaroff();
@@ -83,5 +88,9 @@ class DataController extends GetxController {
     isloading = false;
     update();
   }
+//------------------------------------------------------------------------------------------------------------->
+
+
+
 
 }

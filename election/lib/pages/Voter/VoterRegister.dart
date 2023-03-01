@@ -29,7 +29,7 @@ class VoterRegister extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text(
-            "Register as Admin",
+            "Register as Voter",
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
           ),
@@ -66,7 +66,7 @@ class VoterRegister extends StatelessWidget {
                           },
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                           child: const Text(
-                            'Register as Admin',
+                            'Register as Voter',
                             style: TextStyle(color: Colors.purple),
                           ),
                         )
