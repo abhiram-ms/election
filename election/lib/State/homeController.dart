@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
+import '../Models/Firebase/firebase_api.dart';
+import '../Models/Firebase/firebase_file.dart';
+import '../Models/candidates_model.dart';
 import '../services/Auth.dart';
 import '../services/IntoLogin.dart';
 import '../services/functions.dart';
@@ -261,7 +264,7 @@ class HomeController extends GetxController{
   ////------------------------------------------------------------------->>>>>>>>>>>Add Candidate Controller
 
   late int numberOfCandidates;
-  late File? filetodisplay;
+  File? filetodisplay;
   late bool isselected = false;
   late bool isloading = false;
   UploadTask? uploadTask;
@@ -278,7 +281,6 @@ class HomeController extends GetxController{
       filetodisplay = File(file.path.toString());
       //String filename = file.name.toString();
       isselected=true;
-      update();
 
       if (kDebugMode) {
         print(file.name);
@@ -287,11 +289,12 @@ class HomeController extends GetxController{
         print(file.extension);
         print(file.path);
       }
+      update();
     } else {
       isselected=false;
+      update();
       // User canceled the picker
     }
-
   }
 
   // Getting adhar verified for candidate :::
@@ -378,6 +381,45 @@ class HomeController extends GetxController{
     }
   }
 
+//------------------------------------------------------------------------------------------------------>>>>CloseElection
 
+
+  late Future<List<FirebaseFile>> futureFiles;
+  late int winnervotes = 0;
+  late String winner = '';
+  String? download;
+  // late int row = 5;
+  // late int col = 5;
+
+  void initialize(){
+    futureFiles = FirebaseApi.listAll('electionimages/${elecdata.read('elecData')['electionName']}/partyimages/candidates');
+    winnervotes=0;
+    winner = '';
+    candidateset.clear();
+  }
+
+  late int candidatesNum = 0;
+
+  final Set<Candidates> candidateset = {}; // your data goes here
+
+  void calculateLeader(Candidates candidates,int candidateNum) {
+    //candidates number
+    candidatesNum = candidateNum;
+    // logic to decide the winner
+    if(candidates.votes > winnervotes){
+      winnervotes = candidates.votes;
+      winner = candidates.name;
+    }else if(candidates.votes == winnervotes){
+      winner = '$winner & ${candidates.name}';
+    }
+    // candidatearrayreal.add(candidatesnapshot.data);
+    // Candidates candidate = Candidates(name:snapshot.data![0][index][0],
+    //     votes:int.parse(snapshot.data![0][index][1].toString()));
+    candidateset.add(candidates);
+    Future.delayed(Duration.zero, () async {
+      update();
+    });
+
+  }
 
 }

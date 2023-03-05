@@ -16,3 +16,4 @@ String contractAdressConst = "0x841D7265aF2F5A4d4346d8A07aE5D91f1a440c4e";
 String contractAdressElection = "";
 
 final elecbox = GetStorage();
+final elecdata = GetStorage();

@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:election/pages/Admin/AdminHome.dart';
 import 'package:election/services/IntoLogin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'Auth.dart';
@@ -25,7 +23,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
   void initState() {
     user = auth.currentUser!;
     user.sendEmailVerification();
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       checkEmailVerified();
     });
     super.initState();
